@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NaijaGateway — Unified Nigerian Portal Hub, Daily News & Recruitment Alerts</title>
+  <meta name="description" content="Access all verified Nigerian government, scholarship, loan, mortgage, military, passport, and civic portals in one secure hub with daily news, closing deadline alerts, and social media job posters." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Top Security & Anti-Scam Notice Bar -->
+  <div class="security-banner">
+    <div class="container security-banner-inner">
+      <div class="security-badge-pill">
+        <span class="pulse-dot"></span>
+        <span>ANTI-PHISHING VERIFIED</span>
+      </div>
+      <p class="security-text">
+        Every link on <strong>NaijaGateway</strong> is verified against official <code>.gov.ng</code>, <code>.mil.ng</code>, and statutory domains. Check <strong>Red Closing Alerts</strong> for applications ending within 5 days!
+      </p>
+      <div class="security-actions">
+        <button id="closingSoonQuickBtn" class="urgent-banner-btn" type="button">
+          🚨 <span id="urgentCountBanner">7</span> Closing Soon (&le;5 Days)
+        </button>
+        <button id="scamTipBtn" class="security-link-btn" type="button">Safety Guide &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#" class="brand-logo" aria-label="NaijaGateway Home">
+        <div class="logo-mark">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#008751"/>
+            <path d="M11 8H21V24H11V8Z" fill="white"/>
+            <circle cx="16" cy="16" r="4" fill="#008751"/>
+            <path d="M7 13L11 16L7 19V13Z" fill="white" fill-opacity="0.9"/>
+            <path d="M25 13L21 16L25 19V13Z" fill="white" fill-opacity="0.9"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Naija<span class="brand-accent">Gateway</span></span>
+          <span class="brand-tagline">Unified Portals • Trusted Daily News • Job Posters</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <!-- Audience Mode Toggle -->
+        <div class="audience-switch" role="group" aria-label="Filter by audience">
+          <button type="button" class="audience-btn active" data-audience="all">
+            All Nigerians
+          </button>
+          <button type="button" class="audience-btn" data-audience="closing" title="Applications closing in 5 days or less">
+            <span class="red-dot-indicator"></span>
+            Closing Soon
+          </button>
+          <button type="button" class="audience-btn" data-audience="diaspora" title="Filter portals frequently used by Nigerians in the Diaspora">
+            🌍 Diaspora
+          </button>
+          <button type="button" class="audience-btn" data-audience="saved" id="savedFilterBtn">
+            🔖 Saved <span class="saved-count" id="savedCountBadge">0</span>
+          </button>
+        </div>
+
+        <button type="button" class="btn-poster-hub" id="openPosterStudioHeaderBtn" title="Design & Share Social Media Recruitment Posters">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <span>Poster Studio</span>
+        </button>
+
+        <button type="button" class="btn-secondary" id="suggestPortalBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Submit Portal</span>
+        </button>
+
+        <button type="button" class="theme-toggle" id="themeToggleBtn" aria-label="Toggle dark mode" title="Toggle Light/Dark Mode">
+          <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Trusted News Ticker Bar -->
+  <div class="live-news-ticker">
+    <div class="container ticker-inner">
+      <div class="ticker-badge">
+        <span class="live-pulse"></span>
+        <span>DAILY VERIFIED NEWS</span>
+      </div>
+      <div class="ticker-track-wrapper">
+        <div class="ticker-track" id="newsTickerTrack">
+          <!-- Populated dynamically by app.js from Punch, TVC News, NTA, Daily Times, CNN Africa, BBC Nigeria -->
+        </div>
+      </div>
+      <a href="#dailyNewsSection" class="ticker-view-all">Full News Desk &darr;</a>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-bg-pattern"></div>
+    <div class="container hero-inner">
+      <div class="hero-eyebrow">
+        <span class="flag-mini">🇳🇬</span>
+        <span>One Stop for All Nigerian Institutions, Deadlines &amp; Verified News</span>
+      </div>
+      <h1 class="hero-title">
+        Stop searching endlessly.<br />
+        <span class="text-gradient">Connect directly to any official Nigerian portal.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Access <strong>International Passports</strong>, <strong>Scholarships &amp; NELFUND Loans</strong>, <strong>FMBN House Mortgages</strong>, <strong>NYSC</strong>, <strong>Military &amp; Customs Recruitment</strong>, and <strong>NHIA Health Insurance</strong> — complete with <strong>Red Deadline Alerts</strong>, <strong>Trusted Daily News</strong>, and <strong>1-Click Social Media Job Posters</strong>.
+      </p>
+
+      <!-- Instant Search Box -->
+      <div class="search-wrapper">
+        <div class="search-input-group">
+          <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="search"
+            id="portalSearchInput"
+            class="search-input"
+            placeholder="Search any portal, recruitment, or news (e.g., 'Passport', 'Scholarship', 'NYSC', 'Mortgage', 'Army', 'Custom')..."
+            autocomplete="off"
+          />
+          <button type="button" id="clearSearchBtn" class="clear-search-btn hidden" aria-label="Clear search">
+            &times;
+          </button>
+          <kbd class="search-shortcut" title="Press / to search">/</kbd>
+        </div>
+
+        <!-- Quick Popular Tags -->
+        <div class="quick-tags">
+          <span class="quick-tags-label">Quick Access:</span>
+          <button type="button" class="quick-tag urgent-quick-tag" id="quickFilterClosingBtn">🚨 Closing in &le;5 Days</button>
+          <button type="button" class="quick-tag" data-query="International Passport">🛂 Passport Portal</button>
+          <button type="button" class="quick-tag" data-query="Scholarship">🎓 Scholarships &amp; NELFUND</button>
+          <button type="button" class="quick-tag" data-query="Mortgage">🏠 FMBN House Mortgage</button>
+          <button type="button" class="quick-tag" data-query="NYSC">🪖 NYSC Portal</button>
+          <button type="button" class="quick-tag" data-query="Driver License">🚗 Driver's License</button>
+          <button type="button" class="quick-tag" data-query="Recruitment">🛡️ Army / Customs / NSCDC</button>
+        </div>
+      </div>
+
+      <!-- Platform Stats -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-val" id="totalPortalsCount">25</span>
+          <span class="stat-lbl">Verified Official Portals</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-val stat-val-urgent" id="heroClosingCount">7</span>
+          <span class="stat-lbl">Closing Within 5 Days</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-val">6+</span>
+          <span class="stat-lbl">Trusted News Sources</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-val">Instant</span>
+          <span class="stat-lbl">Social Media Job Posters</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Area: Category Navigation + News Hub + Portal Directory -->
+  <main class="main-directory container">
+    <!-- Sticky Category Filter Bar -->
+    <nav class="category-nav-wrapper" aria-label="Portal Categories">
+      <div class="category-tabs" id="categoryTabs">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </nav>
+
+    <!-- URGENT DEADLINE ALERT BANNER (Portals with <= 5 Days Left) -->
+    <section id="urgentDeadlinesPanel" class="urgent-deadlines-panel">
+      <div class="urgent-panel-header">
+        <div class="urgent-panel-title-wrap">
+          <span class="red-alert-badge-pulse">🚨 CLOSING SOON ALERT</span>
+          <h3>Applications &amp; Recruitments Closing in 5 Days or Less</h3>
+        </div>
+        <p class="urgent-panel-sub">Submit your applications immediately or generate a social media alert poster to warn fellow Nigerians.</p>
+      </div>
+      <div class="urgent-strip-grid" id="urgentDeadlinesStrip">
+        <!-- Populated by app.js -->
+      </div>
+    </section>
+
+    <!-- DAILY VERIFIED NEWS HUB FOR ACTIVE CATEGORY -->
+    <section id="dailyNewsSection" class="daily-news-section">
+      <div class="news-section-header">
+        <div class="news-title-group">
+          <div class="news-live-pill">
+            <span class="live-pulse"></span>
+            <span>DAILY CATEGORY NEWS DESK</span>
+          </div>
+          <h2 id="newsCategoryHeading" class="news-section-title">Latest Verified Nigerian Portal &amp; Institutional News</h2>
+        </div>
+
+        <!-- Source Filter Pills -->
+        <div class="news-source-filters" id="newsSourceFilters">
+          <span class="source-filter-label">Trusted Sources:</span>
+          <button type="button" class="source-pill active" data-source="all">All Sources</button>
+          <button type="button" class="source-pill" data-source="Punch Newspaper">Punch Newspaper</button>
+          <button type="button" class="source-pill" data-source="TVC News">TVC News</button>
+          <button type="button" class="source-pill" data-source="NTA News">NTA</button>
+          <button type="button" class="source-pill" data-source="Daily Times">Daily Times</button>
+          <button type="button" class="source-pill" data-source="BBC News Nigeria">BBC Nigeria</button>
+          <button type="button" class="source-pill" data-source="CNN Africa">CNN Africa</button>
+          <button type="button" class="source-pill" data-source="Channels TV">Channels TV</button>
+        </div>
+      </div>
+
+      <div id="categoryNewsGrid" class="category-news-grid">
+        <!-- Populated dynamically per category by app.js -->
+      </div>
+    </section>
+
+    <!-- Active Filter Info Bar for Portals -->
+    <div class="directory-toolbar">
+      <div class="results-summary">
+        <h2 id="activeCategoryTitle" class="active-category-heading">All Nigerian Portals</h2>
+        <span id="resultsCountText" class="results-count-pill">Showing all portals</span>
+      </div>
+
+      <div class="toolbar-controls">
+        <label class="status-filter-label" for="statusSortSelect">Filter / Sort:</label>
+        <select id="statusSortSelect" class="toolbar-select">
+          <option value="featured">Most Popular First</option>
+          <option value="deadline">🚨 Closing Soonest First (Urgent Deadlines)</option>
+          <option value="recruitment">Active Jobs &amp; Open Applications</option>
+          <option value="free">100% Free Portals First</option>
+          <option value="alpha">Alphabetical (A - Z)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Categorized Sections or Filtered Grid Container -->
+    <div id="portalsContainer" class="portals-container">
+      <!-- Dynamically populated with categorized sections, category news strips, and portal cards -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state hidden">
+      <div class="empty-icon">🔍</div>
+      <h3>No matching Nigerian portal found</h3>
+      <p>We couldn't find a portal matching "<span id="emptySearchQuery"></span>" in this view.</p>
+      <div class="empty-actions">
+        <button type="button" id="resetFiltersBtn" class="btn-primary">Show All Portals</button>
+        <button type="button" id="emptySuggestBtn" class="btn-secondary">Request This Portal</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Value Proposition Section -->
+  <section class="info-section">
+    <div class="container">
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-icon">🚨</div>
+          <h3>Red Deadline Countdown Tags</h3>
+          <p>Never miss a scholarship, NYSC stream, loan window, or military recruitment again. Portals with <strong>5 days or less</strong> left trigger an automatic red countdown alert.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">📰</div>
+          <h3>Daily News by Category</h3>
+          <p>Curated daily updates per category from trusted media houses including <strong>Punch Newspaper, TVC News, NTA, Daily Times, BBC Nigeria, and CNN Africa</strong>.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🎨</div>
+          <h3>Social Media Job &amp; Application Posters</h3>
+          <p>Click <strong>"Share Job Poster"</strong> on any portal to generate a high-resolution graphic flyer with verified domain, requirements, and deadline — ready for WhatsApp, X, Facebook, LinkedIn, or Instagram.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo">
+          <div class="logo-mark">
+            <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#008751"/>
+              <path d="M11 8H21V24H11V8Z" fill="white"/>
+              <circle cx="16" cy="16" r="4" fill="#008751"/>
+            </svg>
+          </div>
+          <span class="brand-name">Naija<span class="brand-accent">Gateway</span></span>
+        </div>
+        <p class="footer-desc">
+          A public-service directory connecting Nigerians at home and abroad to official government, educational, financial, security, and civic portals in one click.
+        </p>
+      </div>
+      <div class="footer-links-col">
+        <h4>Quick Categories</h4>
+        <ul class="footer-cat-links" id="footerCategoryLinks">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+      <div class="footer-disclaimer">
+        <h4>Official Disclaimer</h4>
+        <p>
+          NaijaGateway is an independent unified portal directory, news aggregator, and civic guide. We do not process payments, issue documents, or collect your NIN/BVN. Clicking "Launch Portal" takes you directly to the respective agency's official website.
+        </p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; 2026 NaijaGateway — Empowering Nigerian Citizens &amp; Diaspora.</span>
+      <span>Built for speed, clarity, and safety.</span>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       MODAL 1: Step-by-Step "How to Apply & Requirements" Modal
+       ======================================================================== -->
+  <div id="portalDetailModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalPortalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-meta">
+          <span id="modalCategoryBadge" class="category-pill">Category</span>
+          <span id="modalStatusBadge" class="status-pill status-online">
+            <span class="status-dot"></span> Verified Official Portal
+          </span>
+          <span id="modalDeadlineRedTag" class="red-notice-tag hidden">
+            🚨 Closing Soon
+          </span>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeDetailModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-title-row">
+          <div class="modal-agency-badge" id="modalAgencyAcronym">NIS</div>
+          <div>
+            <h2 id="modalPortalTitle" class="modal-title">Portal Name</h2>
+            <p id="modalAgencyFull" class="modal-agency-name">Full Agency Name</p>
+          </div>
+        </div>
+
+        <!-- Official URL Verification Box -->
+        <div class="verified-url-box">
+          <div class="verified-url-info">
+            <span class="verified-shield">🔒 Official Domain Verified</span>
+            <code id="modalOfficialUrl" class="url-code">https://portal.immigration.gov.ng</code>
+          </div>
+          <button type="button" id="copyUrlBtn" class="btn-copy-url" title="Copy official URL">
+            Copy Link
+          </button>
+        </div>
+
+        <p id="modalDescription" class="modal-description"></p>
+
+        <!-- Key Quick Facts Grid -->
+        <div class="modal-facts-grid">
+          <div class="fact-box">
+            <span class="fact-label">Typical Cost / Fee</span>
+            <strong id="modalCostInfo" class="fact-value">Free / Statutory</strong>
+          </div>
+          <div class="fact-box">
+            <span class="fact-label">Who Can Access</span>
+            <strong id="modalAudienceInfo" class="fact-value">Citizens &amp; Diaspora</strong>
+          </div>
+          <div class="fact-box">
+            <span class="fact-label">Deadline / Availability</span>
+            <strong id="modalWindowInfo" class="fact-value">Open 24/7</strong>
+          </div>
+        </div>
+
+        <!-- Two Column Requirements & Step-by-Step Guide -->
+        <div class="modal-guides-grid">
+          <div class="guide-panel">
+            <h3 class="guide-heading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M9 11l3 3L22 4"></path>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              What You Need Ready
+            </h3>
+            <ul id="modalRequirementsList" class="checklist-items"></ul>
+          </div>
+
+          <div class="guide-panel">
+            <h3 class="guide-heading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              Step-by-Step How to Use
+            </h3>
+            <ol id="modalStepsList" class="steps-items"></ol>
+          </div>
+        </div>
+
+        <!-- Anti-Scam / Insider Tip Box -->
+        <div class="modal-tip-box">
+          <div class="tip-icon">💡</div>
+          <div>
+            <strong>Important Citizen Tip:</strong>
+            <p id="modalProTip">Always ensure your NIN details match your bank and birth records before submitting.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-footer-left">
+          <button type="button" class="btn-secondary" id="modalBookmarkBtn">
+            <span id="modalBookmarkText">Save to Bookmarks</span>
+          </button>
+          <button type="button" class="btn-poster-action" id="modalOpenPosterBtn">
+            🎨 Design &amp; Share Poster
+          </button>
+        </div>
+        <a href="#" id="modalLaunchLink" target="_blank" rel="noopener noreferrer" class="btn-launch-large">
+          <span>Proceed to Official Portal</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: Social Media Job Open & Application Open Poster Studio
+       ======================================================================== -->
+  <div id="posterStudioModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="posterModalTitle">
+    <div class="modal-card modal-poster-studio">
+      <div class="modal-header">
+        <div class="modal-header-meta">
+          <span class="category-pill">🎨 Social Media Broadcast Studio</span>
+          <span class="status-pill">High-Res PNG + Instant Social Share</span>
+        </div>
+        <button type="button" class="modal-close-btn" id="closePosterModalBtn" aria-label="Close poster studio">&times;</button>
+      </div>
+
+      <div class="modal-body poster-studio-body">
+        <!-- Left Column: Live HTML5 Canvas Poster Preview -->
+        <div class="poster-preview-column">
+          <div class="canvas-wrapper">
+            <canvas id="recruitmentPosterCanvas" width="1080" height="1080" aria-label="Social media recruitment and application open poster"></canvas>
+          </div>
+          <div class="poster-download-bar">
+            <button type="button" class="btn-primary btn-full" id="downloadPosterPngBtn">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Download HD Poster (PNG)</span>
+            </button>
+            <button type="button" class="btn-secondary" id="nativeSharePosterBtn" title="Share image file directly to apps">
+              📤 Share Image File
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Poster Controls & Direct Social Media Channels -->
+        <div class="poster-controls-column">
+          <h2 id="posterModalTitle" class="poster-studio-heading">Job Open &amp; Application Poster Designer</h2>
+          <p class="poster-studio-sub">
+            Select any recruitment, scholarship, loan, or civic portal across all 9 categories to generate a verified social media poster and broadcast straight to WhatsApp, X, Facebook, LinkedIn, or Telegram.
+          </p>
+
+          <!-- Select Portal in Any Category -->
+          <div class="form-group">
+            <label for="posterPortalSelect">1. Choose Portal / Recruitment across Categories:</label>
+            <select id="posterPortalSelect" class="toolbar-select full-width-select"></select>
+          </div>
+
+          <!-- Poster Header Badge Style -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="posterBadgeTypeSelect">2. Poster Headline Tag:</label>
+              <select id="posterBadgeTypeSelect" class="toolbar-select">
+                <option value="auto">Auto-Detect (Recommended)</option>
+                <option value="RECRUITMENT OPEN">🛡️ RECRUITMENT OPEN</option>
+                <option value="APPLICATION OPEN">📢 APPLICATION OPEN</option>
+                <option value="SCHOLARSHIP & LOAN OPEN">🎓 SCHOLARSHIP &amp; LOAN OPEN</option>
+                <option value="CLOSING SOON ALERT">🚨 CLOSING SOON ALERT</option>
+                <option value="OFFICIAL PUBLIC NOTICE">🇳🇬 OFFICIAL PUBLIC NOTICE</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="posterThemeSelect">3. Visual Poster Theme:</label>
+              <select id="posterThemeSelect" class="toolbar-select">
+                <option value="emerald">🇳🇬 Nigerian Civic Emerald</option>
+                <option value="urgent">🚨 Urgent Crimson Red Alert</option>
+                <option value="navy">🛡️ Tactical Navy &amp; Gold</option>
+                <option value="royal">💼 Royal Slate &amp; Cyan</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Auto-Generated Social Media Caption -->
+          <div class="form-group">
+            <div class="caption-label-row">
+              <label for="posterCaptionTextarea">4. Ready-to-Post Social Media Caption:</label>
+              <button type="button" id="copyCaptionBtn" class="btn-copy-url">Copy Caption</button>
+            </div>
+            <textarea id="posterCaptionTextarea" rows="5" class="caption-textarea"></textarea>
+          </div>
+
+          <!-- Direct One-Click Social Media Broadcast Buttons -->
+          <div class="social-broadcast-box">
+            <span class="social-broadcast-title">5. Post Straight to Social Media:</span>
+            <div class="social-buttons-grid">
+              <a href="#" id="shareWhatsAppBtn" target="_blank" rel="noopener noreferrer" class="social-btn social-whatsapp">
+                <span>🟢 WhatsApp</span>
+              </a>
+              <a href="#" id="shareTwitterBtn" target="_blank" rel="noopener noreferrer" class="social-btn social-twitter">
+                <span>𝕏 Post on X</span>
+              </a>
+              <a href="#" id="shareFacebookBtn" target="_blank" rel="noopener noreferrer" class="social-btn social-facebook">
+                <span>🔵 Facebook</span>
+              </a>
+              <a href="#" id="shareLinkedInBtn" target="_blank" rel="noopener noreferrer" class="social-btn social-linkedin">
+                <span>🔗 LinkedIn</span>
+              </a>
+              <a href="#" id="shareTelegramBtn" target="_blank" rel="noopener noreferrer" class="social-btn social-telegram">
+                <span>✈️ Telegram</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 3: Safety & Anti-Scam Guide Modal
+       ======================================================================== -->
+  <div id="safetyModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="safetyModalTitle">
+    <div class="modal-card modal-compact">
+      <div class="modal-header">
+        <span class="category-pill">Citizen Protection Guide</span>
+        <button type="button" class="modal-close-btn" id="closeSafetyModalBtn" aria-label="Close safety modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h2 id="safetyModalTitle" class="modal-title">How to Stay Safe on Nigerian Government Portals</h2>
+        <p class="modal-description">
+          Many Nigerians lose money or miss deadlines because of fake links shared on WhatsApp or touts charging inflated fees for free government portals.
+        </p>
+        <ul class="safety-rules-list">
+          <li>
+            <strong>1. Check for <code>.gov.ng</code> or Statutory Domains:</strong>
+            Official Federal Government portals end in <code>.gov.ng</code> or <code>.mil.ng</code> (e.g., <code>immigration.gov.ng</code>, <code>army.mil.ng</code>, <code>nelf.gov.ng</code>).
+          </li>
+          <li>
+            <strong>2. Military &amp; Paramilitary Recruitment is 100% FREE:</strong>
+            Nigerian Army, Navy, Air Force, Customs (NCS), Civil Defence (NSCDC), Police, and FRSC never charge application fees.
+          </li>
+          <li>
+            <strong>3. Watch the Red Deadline Tags:</strong>
+            Portals with a red <strong>"Closing in X Days"</strong> tag on NaijaGateway are approaching their official cutoff date. Submit early to avoid portal congestion.
+          </li>
+          <li>
+            <strong>4. Pay Only via Remita or Official Portal Gateways:</strong>
+            Never transfer money to a personal bank account for passport renewals, driver's licenses, or federal mortgages.
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" id="ackSafetyBtn">Got It, Back to Directory</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 4: Submit / Suggest a Portal Modal
+       ======================================================================== -->
+  <div id="suggestModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="suggestModalTitle">
+    <div class="modal-card modal-compact">
+      <div class="modal-header">
+        <span class="category-pill">Community Contribution</span>
+        <button type="button" class="modal-close-btn" id="closeSuggestModalBtn" aria-label="Close suggest modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h2 id="suggestModalTitle" class="modal-title">Add or Suggest a Nigerian Portal</h2>
+        <p class="modal-description">
+          Know an official federal, state, scholarship, or agency portal with an upcoming deadline? Add it to your directory below.
+        </p>
+        <form id="suggestPortalForm" class="suggest-form">
+          <div class="form-group">
+            <label for="newPortalName">Portal / Recruitment Name *</label>
+            <input type="text" id="newPortalName" required placeholder="e.g., Lagos State Teachers Recruitment Portal" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newPortalAgency">Institution / Acronym *</label>
+              <input type="text" id="newPortalAgency" required placeholder="e.g., TESCOM" />
+            </div>
+            <div class="form-group">
+              <label for="newPortalCategory">Category *</label>
+              <select id="newPortalCategory" required>
+                <option value="identity">Identity, Passport &amp; Civic</option>
+                <option value="education">Education, Scholarships &amp; NYSC</option>
+                <option value="finance">Loans, Mortgages &amp; Grants</option>
+                <option value="security">Military, Paramilitary &amp; Security</option>
+                <option value="transport">Driving, Vehicles &amp; Transport</option>
+                <option value="health">Health Insurance &amp; Medical</option>
+                <option value="business">Business, Tax, Trade &amp; Customs</option>
+                <option value="sports">Sports, Youth &amp; Creative</option>
+                <option value="diaspora">Diaspora &amp; Consular Services</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newPortalUrl">Official Website URL *</label>
+              <input type="url" id="newPortalUrl" required placeholder="https://..." />
+            </div>
+            <div class="form-group">
+              <label for="newPortalDaysLeft">Days Until Deadline (Optional)</label>
+              <input type="number" id="newPortalDaysLeft" min="1" max="365" placeholder="e.g., 4 (triggers Red Alert if ≤5)" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="newPortalDesc">Brief Description of What Citizens Can Do Here *</label>
+            <textarea id="newPortalDesc" rows="3" required placeholder="Explain what users can register for or access on this portal..."></textarea>
+          </div>
+          <div class="form-footer">
+            <button type="button" class="btn-secondary" id="cancelSuggestBtn">Cancel</button>
+            <button type="submit" class="btn-primary">Add Portal to Directory</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" class="toast hidden" role="status" aria-live="polite">
+    <span id="toastMessage">Link copied!</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
