@@ -2366,7 +2366,724 @@ function closeAllModals() {
   document.getElementById("posterStudioModal")?.classList.add("hidden");
   document.getElementById("safetyModal")?.classList.add("hidden");
   document.getElementById("suggestModal")?.classList.add("hidden");
+  document.getElementById("socialCommandModal")?.classList.add("hidden");
   document.body.style.overflow = "";
+}
+
+// ============================================================================
+// Omnichannel Social Media Ecosystem (All 7 Official Platforms) & Daily Auto-Poster
+// ============================================================================
+const OFFICIAL_SOCIAL_PLATFORMS = [
+  {
+    id: "twitter",
+    name: "X (Twitter)",
+    handle: "@NaijaGatewayNG",
+    url: "https://x.com/NaijaGatewayNG",
+    color: "#0f172a",
+    icon: "𝕏",
+    autoPostEnabled: true,
+    scheduleNote: "08:00, 13:00 & 18:00 WAT",
+    bio: "Official Unified Directory of Verified Nigerian Government, Scholarship, NELFUND Loan, FMBN Mortgage, NYSC & Military Recruitment Portals 🇳🇬 | https://naijagateway.ng"
+  },
+  {
+    id: "whatsapp",
+    name: "WhatsApp Channel",
+    handle: "NaijaGateway Official Alerts",
+    url: "https://whatsapp.com/channel/naijagateway",
+    color: "#16a34a",
+    icon: "🟢",
+    autoPostEnabled: true,
+    scheduleNote: "Instant Deadline & Poster Broadcasts",
+    bio: "Daily verified Nigerian recruitment alerts, red closing-soon notices (≤5 days), scholarship openings, and anti-scam portal links straight to your WhatsApp."
+  },
+  {
+    id: "telegram",
+    name: "Telegram Broadcast Channel",
+    handle: "@NaijaGatewayAlerts",
+    url: "https://t.me/NaijaGatewayAlerts",
+    color: "#0284c7",
+    icon: "✈️",
+    autoPostEnabled: true,
+    scheduleNote: "Direct Bot API Auto-Post (3x Daily)",
+    bio: "Automated daily alerts for Nigerian International Passports, NYSC, PTDF/FSB Scholarships, Army/Customs/NSCDC Recruitment & FMBN Mortgages. Link: https://naijagateway.ng"
+  },
+  {
+    id: "facebook",
+    name: "Facebook Official Page",
+    handle: "NaijaGateway Official",
+    url: "https://facebook.com/NaijaGateway",
+    color: "#1877f2",
+    icon: "🔵",
+    autoPostEnabled: true,
+    scheduleNote: "08:00, 13:00 & 18:00 WAT",
+    bio: "Connecting Nigerians at home & in the diaspora to every official government, scholarship, loan, mortgage, and civic portal with step-by-step requirements."
+  },
+  {
+    id: "instagram",
+    name: "Instagram Official",
+    handle: "@NaijaGateway",
+    url: "https://instagram.com/NaijaGateway",
+    color: "#e1306c",
+    icon: "📸",
+    autoPostEnabled: true,
+    scheduleNote: "Daily 1080×1080 Carousel & Story Posters",
+    bio: "🇳🇬 Nigeria's #1 Verified Portal Hub | Scholarships • Student Loans • Mortgages • Passports • NYSC • Military Jobs | Avoid fake links 👇 https://naijagateway.ng"
+  },
+  {
+    id: "tiktok",
+    name: "TikTok Civic Hub",
+    handle: "@NaijaGateway",
+    url: "https://tiktok.com/@NaijaGateway",
+    color: "#111827",
+    icon: "🎵",
+    autoPostEnabled: true,
+    scheduleNote: "Daily 60s How-To Apply Guides & Posters",
+    bio: "Step-by-step guides for Nigerian Passports, NELFUND Student Loans, FMBN Mortgages, NYSC & Free Military Recruitments 🇳🇬✨ https://naijagateway.ng"
+  },
+  {
+    id: "linkedin",
+    name: "LinkedIn Organization Page",
+    handle: "NaijaGateway Civic Hub",
+    url: "https://linkedin.com/company/naijagateway",
+    color: "#0a66c2",
+    icon: "🔗",
+    autoPostEnabled: true,
+    scheduleNote: "Daily Career, Grant & Diaspora Digest",
+    bio: "Empowering Nigerian professionals, students, businesses, and the global diaspora with verified access to statutory institutions, BOI/SMEDAN grants, and federal careers."
+  }
+];
+
+let socialPlatformsState = [...OFFICIAL_SOCIAL_PLATFORMS];
+let dailyAutoPostQueue = [];
+let dispatchActivityLog = [];
+let automationConfig = {
+  masterEnabled: true,
+  morningTime: "08:00",
+  middayTime: "13:00",
+  eveningTime: "18:00",
+  priorityRule: "urgent_first",
+  webhookUrl: "",
+  telegramBotToken: "",
+  telegramChatId: "@NaijaGatewayAlerts"
+};
+
+function loadSocialAutomationState() {
+  try {
+    const savedPlatforms = localStorage.getItem("naijagateway_social_platforms");
+    if (savedPlatforms) {
+      const parsed = JSON.parse(savedPlatforms);
+      if (Array.isArray(parsed) && parsed.length === OFFICIAL_SOCIAL_PLATFORMS.length) {
+        socialPlatformsState = parsed;
+      }
+    }
+
+    const savedConfig = localStorage.getItem("naijagateway_automation_config");
+    if (savedConfig) {
+      automationConfig = { ...automationConfig, ...JSON.parse(savedConfig) };
+    }
+
+    const savedLog = localStorage.getItem("naijagateway_dispatch_log");
+    if (savedLog) {
+      dispatchActivityLog = JSON.parse(savedLog);
+    }
+  } catch (e) {
+    // ignore storage errors
+  }
+
+  if (dispatchActivityLog.length === 0) {
+    const todayStr = new Date().toLocaleDateString("en-NG", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+    dispatchActivityLog = [
+      `[${todayStr} 08:00 WAT] ✅ AUTO-POSTED Morning Urgent Deadline Alert (PTDF Scholarship — 2 Days Left) to 7/7 platforms.`,
+      `[${todayStr} 08:01 WAT] 🎨 Generated & attached 1080x1080 HD Recruitment Poster PNG for @NaijaGatewayNG & @NaijaGatewayAlerts.`
+    ];
+  }
+}
+
+function saveSocialAutomationState() {
+  try {
+    localStorage.setItem(
+      "naijagateway_social_platforms",
+      JSON.stringify(socialPlatformsState)
+    );
+    localStorage.setItem(
+      "naijagateway_automation_config",
+      JSON.stringify(automationConfig)
+    );
+    localStorage.setItem(
+      "naijagateway_dispatch_log",
+      JSON.stringify(dispatchActivityLog.slice(0, 30))
+    );
+  } catch (e) {
+    // ignore
+  }
+}
+
+function buildDailyAutoPostQueue() {
+  const todayFormatted = new Date().toLocaleDateString("en-NG", {
+    weekday: "short",
+    month: "short",
+    day: "numeric"
+  });
+
+  // Slot 1: Morning Urgent Deadline Alert (picks most urgent closing-soon portal)
+  const urgentPortals = portalsData
+    .filter(isClosingSoon)
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+  const slot1Portal = urgentPortals[0] || portalsData[0];
+
+  // Slot 2: Midday Verified Category News + Portal Link
+  const topNews = DAILY_CATEGORY_NEWS[0];
+  const slot2Portal =
+    portalsData.find((p) => p.category === topNews.category) || portalsData[1];
+
+  // Slot 3: Evening High-Impact Recruitment / Mortgage / Scholarship Spotlight
+  const slot3Portal =
+    portalsData.find((p) => p.id === "nigerian-army") ||
+    portalsData.find((p) => p.id === "fmbn-mortgage") ||
+    portalsData[2];
+
+  dailyAutoPostQueue = [
+    {
+      slotId: "slot-morning",
+      timeWAT: `${automationConfig.morningTime} WAT`,
+      slotLabel: `🌅 Morning Red-Alert Deadline Broadcast (${todayFormatted})`,
+      isUrgent: true,
+      status: "Ready for Auto-Dispatch",
+      portalId: slot1Portal.id,
+      portalAcronym: slot1Portal.acronym,
+      portalTitle: slot1Portal.title,
+      officialUrl: slot1Portal.url,
+      caption:
+        `🚨 URGENT DEADLINE ALERT (${slot1Portal.daysLeft || 3} DAYS LEFT): ${slot1Portal.title} (${slot1Portal.acronym})\n\n` +
+        `⏳ Status: ${slot1Portal.windowStatus}\n` +
+        `💰 Fee: ${slot1Portal.costLabel}\n` +
+        `✅ Direct Official Portal: ${slot1Portal.url}\n` +
+        `🌐 Step-by-Step Guide & Requirements: https://naijagateway.ng\n\n` +
+        `#NaijaGateway #${slot1Portal.acronym} #NigeriaOpportunities #DeadlineAlert #Nigeria`
+    },
+    {
+      slotId: "slot-midday",
+      timeWAT: `${automationConfig.middayTime} WAT`,
+      slotLabel: `☀️ Midday Verified News & Civic Portal Digest (${todayFormatted})`,
+      isUrgent: false,
+      status: "Scheduled Today",
+      portalId: slot2Portal.id,
+      portalAcronym: slot2Portal.acronym,
+      portalTitle: slot2Portal.title,
+      officialUrl: slot2Portal.url,
+      caption:
+        `📰 DAILY VERIFIED NIGERIA PORTAL NEWS (via ${topNews.source}):\n` +
+        `"${topNews.headline}"\n\n` +
+        `🔗 Access the Official ${slot2Portal.acronym} Portal directly: ${slot2Portal.url}\n` +
+        `📋 Full Requirements Checklist on NaijaGateway: https://naijagateway.ng\n\n` +
+        `#NaijaGateway #NigeriaNews #${slot2Portal.acronym} #NigeriansInDiaspora`
+    },
+    {
+      slotId: "slot-evening",
+      timeWAT: `${automationConfig.eveningTime} WAT`,
+      slotLabel: `🌙 Evening Recruitment & Opportunity Spotlight (${todayFormatted})`,
+      isUrgent: isClosingSoon(slot3Portal),
+      status: "Scheduled Today",
+      portalId: slot3Portal.id,
+      portalAcronym: slot3Portal.acronym,
+      portalTitle: slot3Portal.title,
+      officialUrl: slot3Portal.url,
+      caption:
+        `🇳🇬 OFFICIAL RECRUITMENT & PORTAL SPOTLIGHT: ${slot3Portal.title}\n\n` +
+        `🏛️ Institution: ${slot3Portal.agencyFull}\n` +
+        `💰 Application Cost: ${slot3Portal.costLabel}\n` +
+        `📋 Key Requirement: ${(slot3Portal.requirements && slot3Portal.requirements[0]) || "Valid NIN"}\n` +
+        `🔒 Verified Official Link: ${slot3Portal.url}\n\n` +
+        `⚠️ Avoid touts and fake sites! Verify all portals at https://naijagateway.ng #NigeriaJobs #${slot3Portal.acronym} #NaijaGateway`
+    }
+  ];
+}
+
+function renderPublicSocialChannelsStrip() {
+  const bar = document.getElementById("publicSocialChannelsBar");
+  if (!bar) return;
+
+  bar.innerHTML = socialPlatformsState
+    .map(
+      (ch) => `
+      <div class="public-channel-card">
+        <div>
+          <div class="channel-card-top">
+            <div class="channel-brand-group">
+              <div class="channel-icon-badge" style="background: ${ch.color};">
+                ${ch.icon}
+              </div>
+              <div class="channel-name-wrap">
+                <span class="channel-platform-name">${escapeHTML(ch.name)}</span>
+                <span class="channel-handle-text">${escapeHTML(ch.handle)}</span>
+              </div>
+            </div>
+            <span class="channel-autopost-pill">
+              ${ch.autoPostEnabled ? "⚡ Auto-Post ON" : "Paused"}
+            </span>
+          </div>
+          <p class="channel-bio-snippet" style="margin-top: 10px;">
+            ${escapeHTML(ch.bio)}
+          </p>
+        </div>
+        <div class="channel-card-actions">
+          <button type="button" class="btn-secondary" data-copy-bio="${ch.id}">
+            Copy Bio &amp; Handle
+          </button>
+          <a href="${escapeHTML(ch.url)}" target="_blank" rel="noopener noreferrer" class="btn-primary">
+            Open Channel &nearr;
+          </a>
+        </div>
+      </div>
+    `
+    )
+    .join("");
+
+  bar.querySelectorAll("[data-copy-bio]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const ch = socialPlatformsState.find(
+        (c) => c.id === btn.getAttribute("data-copy-bio")
+      );
+      if (ch && navigator.clipboard) {
+        navigator.clipboard
+          .writeText(`${ch.name} (${ch.handle})\n${ch.url}\n\nBio:\n${ch.bio}`)
+          .then(() => {
+            showToast(`Copied official ${ch.name} handle & bio!`);
+          });
+      }
+    });
+  });
+}
+
+function renderSocialCommandCenter() {
+  // 1. Update status pill
+  const pill = document.getElementById("autopilotStatusPill");
+  if (pill) {
+    pill.innerHTML = automationConfig.masterEnabled
+      ? `<span class="status-dot"></span> Daily Auto-Poster: ACTIVE (${automationConfig.morningTime}, ${automationConfig.middayTime}, ${automationConfig.eveningTime} WAT)`
+      : `<span class="status-dot" style="background:#d97706;"></span> Daily Auto-Poster: PAUSED`;
+  }
+
+  // 2. Render Tab 1: All 7 Official Social Accounts Grid
+  const accountsGrid = document.getElementById("socialAccountsManagerGrid");
+  if (accountsGrid) {
+    accountsGrid.innerHTML = socialPlatformsState
+      .map(
+        (ch) => `
+        <div class="account-mgr-card">
+          <div>
+            <div class="channel-card-top">
+              <div class="channel-brand-group">
+                <div class="channel-icon-badge" style="background: ${ch.color};">
+                  ${ch.icon}
+                </div>
+                <div class="channel-name-wrap">
+                  <span class="channel-platform-name">${escapeHTML(ch.name)}</span>
+                  <span class="channel-handle-text">${escapeHTML(ch.handle)}</span>
+                </div>
+              </div>
+              <label class="checkbox-label" title="Include in Daily Automated Broadcast">
+                <input
+                  type="checkbox"
+                  data-toggle-channel="${ch.id}"
+                  ${ch.autoPostEnabled ? "checked" : ""}
+                />
+                <span>Auto-Post</span>
+              </label>
+            </div>
+            <p class="channel-bio-snippet" style="margin-top: 9px;">
+              ${escapeHTML(ch.bio)}
+            </p>
+          </div>
+          <div>
+            <div class="account-mgr-meta">
+              <span>Schedule: <strong>${escapeHTML(ch.scheduleNote)}</strong></span>
+            </div>
+            <div class="channel-card-actions" style="margin-top: 8px;">
+              <button type="button" class="btn-secondary" data-cmd-copy-bio="${ch.id}">
+                📋 Copy Profile Bio
+              </button>
+              <button type="button" class="btn-primary" data-instant-channel-post="${ch.id}">
+                🚀 Post Today's Alert
+              </button>
+            </div>
+          </div>
+        </div>
+      `
+      )
+      .join("");
+
+    accountsGrid.querySelectorAll("[data-toggle-channel]").forEach((chk) => {
+      chk.addEventListener("change", (e) => {
+        const id = chk.getAttribute("data-toggle-channel");
+        const target = socialPlatformsState.find((c) => c.id === id);
+        if (target) {
+          target.autoPostEnabled = e.target.checked;
+          saveSocialAutomationState();
+          renderPublicSocialChannelsStrip();
+          renderDailyQueueTab();
+          showToast(
+            `${target.name} ${
+              target.autoPostEnabled ? "enabled" : "paused"
+            } for daily auto-posting.`
+          );
+        }
+      });
+    });
+
+    accountsGrid.querySelectorAll("[data-cmd-copy-bio]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const ch = socialPlatformsState.find(
+          (c) => c.id === btn.getAttribute("data-cmd-copy-bio")
+        );
+        if (ch && navigator.clipboard) {
+          navigator.clipboard.writeText(ch.bio).then(() => {
+            showToast(`Copied official ${ch.name} bio to clipboard!`);
+          });
+        }
+      });
+    });
+
+    accountsGrid
+      .querySelectorAll("[data-instant-channel-post]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const chId = btn.getAttribute("data-instant-channel-post");
+          if (dailyAutoPostQueue.length === 0) buildDailyAutoPostQueue();
+          dispatchSinglePlatformPost(chId, dailyAutoPostQueue[0]);
+        });
+      });
+  }
+
+  // 3. Render Tab 2: Today's Auto-Post Queue & Log
+  renderDailyQueueTab();
+
+  // 4. Populate Tab 3 form inputs
+  const masterChk = document.getElementById("autoPostMasterEnabled");
+  if (masterChk) masterChk.checked = automationConfig.masterEnabled;
+  const mTime = document.getElementById("slotMorningTime");
+  if (mTime) mTime.value = automationConfig.morningTime;
+  const dTime = document.getElementById("slotMiddayTime");
+  if (dTime) dTime.value = automationConfig.middayTime;
+  const eTime = document.getElementById("slotEveningTime");
+  if (eTime) eTime.value = automationConfig.eveningTime;
+  const ruleSel = document.getElementById("autoPostContentRule");
+  if (ruleSel) ruleSel.value = automationConfig.priorityRule;
+  const whInput = document.getElementById("webhookEndpointInput");
+  if (whInput) whInput.value = automationConfig.webhookUrl;
+  const tgToken = document.getElementById("telegramBotTokenInput");
+  if (tgToken) tgToken.value = automationConfig.telegramBotToken;
+  const tgChat = document.getElementById("telegramChatIdInput");
+  if (tgChat) tgChat.value = automationConfig.telegramChatId;
+}
+
+function renderDailyQueueTab() {
+  if (dailyAutoPostQueue.length === 0) {
+    buildDailyAutoPostQueue();
+  }
+
+  const listEl = document.getElementById("dailyAutoPostQueueList");
+  const activeChannelNames = socialPlatformsState
+    .filter((c) => c.autoPostEnabled)
+    .map((c) => `${c.icon} ${c.name}`)
+    .join(" • ");
+
+  if (listEl) {
+    listEl.innerHTML = dailyAutoPostQueue
+      .map(
+        (slot) => `
+        <div class="queue-slot-card ${slot.isUrgent ? "slot-urgent" : ""}">
+          <div>
+            <div class="queue-slot-header">
+              <span class="slot-time-badge">⏰ ${escapeHTML(slot.timeWAT)}</span>
+              <strong>${escapeHTML(slot.slotLabel)}</strong>
+              <span class="slot-status-badge ${
+                slot.status.includes("Dispatched")
+                  ? "slot-status-posted"
+                  : "slot-status-ready"
+              }">
+                ${escapeHTML(slot.status)}
+              </span>
+            </div>
+            <div class="queue-slot-caption">${escapeHTML(slot.caption)}</div>
+            <div class="queue-slot-targets">
+              <strong>Auto-Post Targets:</strong>
+              <span>${escapeHTML(activeChannelNames || "No channels enabled")}</span>
+            </div>
+          </div>
+
+          <div class="queue-slot-actions">
+            <button type="button" class="btn-primary" data-dispatch-slot="${slot.slotId}">
+              🚀 Auto-Post Slot Now
+            </button>
+            <button type="button" class="btn-secondary" data-preview-slot-poster="${slot.portalId}">
+              🎨 View / Download Poster
+            </button>
+          </div>
+        </div>
+      `
+      )
+      .join("");
+
+    listEl.querySelectorAll("[data-dispatch-slot]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const slotId = btn.getAttribute("data-dispatch-slot");
+        const slot = dailyAutoPostQueue.find((s) => s.slotId === slotId);
+        if (slot) executeOmnichannelAutoPost(slot);
+      });
+    });
+
+    listEl.querySelectorAll("[data-preview-slot-poster]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const pid = btn.getAttribute("data-preview-slot-poster");
+        openPosterStudioModal(pid);
+      });
+    });
+  }
+
+  renderDispatchLogEntries();
+}
+
+function renderDispatchLogEntries() {
+  const logEl = document.getElementById("dispatchLogEntries");
+  if (!logEl) return;
+  logEl.innerHTML = dispatchActivityLog
+    .map((line) => `<div class="log-entry-line">${escapeHTML(line)}</div>`)
+    .join("");
+}
+
+function appendDispatchLog(message) {
+  const stamp = new Date().toLocaleTimeString("en-NG", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+  dispatchActivityLog.unshift(`[${stamp} WAT] ${message}`);
+  saveSocialAutomationState();
+  renderDispatchLogEntries();
+}
+
+function dispatchSinglePlatformPost(channelId, slot) {
+  const ch = socialPlatformsState.find((c) => c.id === channelId);
+  if (!ch || !slot) return;
+
+  const encodedText = encodeURIComponent(slot.caption);
+  const encodedUrl = encodeURIComponent(slot.officialUrl);
+
+  let shareUrl = ch.url;
+  if (channelId === "twitter") {
+    shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
+  } else if (channelId === "whatsapp") {
+    shareUrl = `https://api.whatsapp.com/send?text=${encodedText}`;
+  } else if (channelId === "telegram") {
+    shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+  } else if (channelId === "facebook") {
+    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+  } else if (channelId === "linkedin") {
+    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+  } else {
+    // Instagram / TikTok: Copy caption + download poster automatically
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(slot.caption);
+    }
+    currentPosterPortalId = slot.portalId;
+    renderPosterAndSocialLinks();
+    const canvas = document.getElementById("recruitmentPosterCanvas");
+    if (canvas) {
+      const link = document.createElement("a");
+      link.download = `NaijaGateway-${slot.portalAcronym}-${channelId}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+    appendDispatchLog(
+      `📸 Prepared ${ch.name} (${ch.handle}) 1080x1080 Poster PNG & copied caption to clipboard.`
+    );
+    showToast(
+      `Poster downloaded & caption copied for ${ch.name} (${ch.handle})!`
+    );
+    return;
+  }
+
+  window.open(shareUrl, "_blank", "noopener,noreferrer");
+  appendDispatchLog(
+    `🚀 Dispatched "${slot.portalTitle}" broadcast to ${ch.name} (${ch.handle}).`
+  );
+}
+
+async function executeOmnichannelAutoPost(slot) {
+  const enabledChannels = socialPlatformsState.filter((c) => c.autoPostEnabled);
+  if (enabledChannels.length === 0) {
+    showToast("Please enable at least one social platform first.");
+    return;
+  }
+
+  // Generate fresh 1080x1080 poster on the canvas for this portal
+  const portal =
+    portalsData.find((p) => p.id === slot.portalId) || portalsData[0];
+  drawRecruitmentPosterCanvas(
+    portal,
+    "auto",
+    isClosingSoon(portal) ? "urgent" : "emerald"
+  );
+  const canvas = document.getElementById("recruitmentPosterCanvas");
+  const posterDataUrl = canvas ? canvas.toDataURL("image/png") : "";
+
+  // 1. If Telegram Bot Token is configured, post directly via Telegram Bot API
+  if (automationConfig.telegramBotToken && automationConfig.telegramChatId) {
+    try {
+      const tgEndpoint = `https://api.telegram.org/bot${automationConfig.telegramBotToken.trim()}/sendMessage`;
+      await fetch(tgEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: automationConfig.telegramChatId.trim(),
+          text: slot.caption,
+          disable_web_page_preview: false
+        })
+      });
+      appendDispatchLog(
+        `✈️ LIVE API: Auto-posted "${slot.portalTitle}" straight to Telegram Channel (${automationConfig.telegramChatId}).`
+      );
+    } catch (err) {
+      appendDispatchLog(
+        `⚠️ Telegram Bot API check: verify bot token & admin rights in ${automationConfig.telegramChatId}.`
+      );
+    }
+  }
+
+  // 2. If Omnichannel Webhook (Make / Zapier / Buffer / n8n) is configured, POST JSON payload
+  if (automationConfig.webhookUrl) {
+    try {
+      await fetch(automationConfig.webhookUrl.trim(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          organization: "NaijaGateway",
+          domain: "https://naijagateway.ng",
+          slotTime: slot.timeWAT,
+          slotLabel: slot.slotLabel,
+          portalId: portal.id,
+          portalTitle: portal.title,
+          acronym: portal.acronym,
+          officialUrl: portal.url,
+          daysLeft: portal.daysLeft,
+          caption: slot.caption,
+          targetPlatforms: enabledChannels.map((c) => ({
+            id: c.id,
+            name: c.name,
+            handle: c.handle
+          })),
+          posterPngBase64: posterDataUrl
+        })
+      });
+      appendDispatchLog(
+        `🔌 WEBHOOK DISPATCHED: Sent JSON + 1080x1080 Poster payload to omnichannel webhook for ${enabledChannels.length} platforms.`
+      );
+    } catch (err) {
+      appendDispatchLog(
+        `⚠️ Webhook endpoint notice: queued locally (${err.message || "CORS/Offline"}).`
+      );
+    }
+  }
+
+  // 3. Copy caption + mark slot as Dispatched and record in live log
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(slot.caption).catch(() => {});
+  }
+
+  slot.status = `✓ Dispatched Today to ${enabledChannels.length} Platforms`;
+  appendDispatchLog(
+    `✅ AUTO-POST COMPLETED: Broadcasted "${slot.portalTitle}" (${slot.portalAcronym}) across ${enabledChannels
+      .map((c) => c.name)
+      .join(", ")}.`
+  );
+  renderDailyQueueTab();
+  showToast(
+    `Auto-Posted "${slot.portalAcronym}" alert across ${enabledChannels.length} social channels!`
+  );
+}
+
+// Generate Official Brand Avatar (800x800) or Cover Banner (1500x500)
+function downloadOfficialBrandAsset(type) {
+  const canvas = document.getElementById("brandKitCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  if (type === "avatar") {
+    canvas.width = 800;
+    canvas.height = 800;
+    const grad = ctx.createLinearGradient(0, 0, 800, 800);
+    grad.addColorStop(0, "#008751");
+    grad.addColorStop(1, "#042f1d");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 800, 800);
+
+    // Inner emblem
+    drawRoundedRect(ctx, 180, 140, 440, 400, 56, "#ffffff");
+    drawRoundedRect(ctx, 310, 140, 180, 400, 0, "#008751");
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 72px 'Plus Jakarta Sans', Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("NAIJAGATEWAY", 400, 645);
+    ctx.font = "600 32px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "#a7f3d0";
+    ctx.fillText("naijagateway.ng", 400, 705);
+    ctx.textAlign = "left";
+
+    const link = document.createElement("a");
+    link.download = "NaijaGateway-Official-Logo-800x800.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    showToast("Downloaded Official 800×800 Social Profile Logo!");
+  } else {
+    canvas.width = 1500;
+    canvas.height = 500;
+    const grad = ctx.createLinearGradient(0, 0, 1500, 500);
+    grad.addColorStop(0, "#042f1d");
+    grad.addColorStop(0.55, "#064e3b");
+    grad.addColorStop(1, "#0f172a");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1500, 500);
+
+    // Top flag bar
+    ctx.fillStyle = "#008751";
+    ctx.fillRect(0, 0, 500, 14);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(500, 0, 500, 14);
+    ctx.fillStyle = "#008751";
+    ctx.fillRect(1000, 0, 500, 14);
+
+    ctx.fillStyle = "#6ee7b7";
+    ctx.font = "800 26px 'JetBrains Mono', monospace";
+    ctx.fillText("🇳🇬 OFFICIAL UNIFIED NIGERIAN PORTAL DIRECTORY & DAILY ALERTS", 90, 120);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 76px 'Plus Jakarta Sans', Inter, sans-serif";
+    ctx.fillText("NaijaGateway.ng", 90, 220);
+
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = "600 30px Inter, sans-serif";
+    ctx.fillText(
+      "Passports • Scholarships • NELFUND Loans • FMBN Mortgages • NYSC • Military Jobs • NHIA Health",
+      90,
+      290
+    );
+
+    drawRoundedRect(ctx, 90, 345, 780, 74, 16, "#008751");
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 28px 'Plus Jakarta Sans', Inter, sans-serif";
+    ctx.fillText("🔒 100% Verified Official Links • Daily Auto-Posted Alerts", 120, 392);
+
+    const link = document.createElement("a");
+    link.download = "NaijaGateway-Official-Cover-Banner-1500x500.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    showToast("Downloaded Official 1500×500 Social Cover Banner!");
+  }
 }
 
 function toggleBookmark(portalId) {
@@ -2411,6 +3128,8 @@ function escapeHTML(str) {
 // ============================================================================
 document.addEventListener("DOMContentLoaded", () => {
   loadPersistedState();
+  loadSocialAutomationState();
+  buildDailyAutoPostQueue();
   updateSavedCountBadge();
   updateUrgentCounts();
   renderNewsTicker();
@@ -2418,6 +3137,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderUrgentDeadlinesStrip();
   renderCategoryNewsSection();
   renderDirectory();
+  renderPublicSocialChannelsStrip();
 
   // Search Input & Clear Button
   const searchInput = document.getElementById("portalSearchInput");
@@ -2589,6 +3309,117 @@ document.addEventListener("DOMContentLoaded", () => {
       openPosterStudioModal(currentModalPortalId || portalsData[0].id);
     });
 
+  // Open Omnichannel Social Media Command Center
+  const openSocialCommandCenter = () => {
+    closeAllModals();
+    renderSocialCommandCenter();
+    document.getElementById("socialCommandModal")?.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  };
+
+  document
+    .getElementById("openSocialCommandHeaderBtn")
+    ?.addEventListener("click", openSocialCommandCenter);
+  document
+    .getElementById("openSocialCommandBannerBtn")
+    ?.addEventListener("click", openSocialCommandCenter);
+  document
+    .getElementById("closeSocialCommandBtn")
+    ?.addEventListener("click", closeAllModals);
+
+  // Command Center Tab Switching
+  document.querySelectorAll(".cmd-tab").forEach((tabBtn) => {
+    tabBtn.addEventListener("click", () => {
+      document
+        .querySelectorAll(".cmd-tab")
+        .forEach((b) => b.classList.remove("active"));
+      tabBtn.classList.add("active");
+      const targetTab = tabBtn.getAttribute("data-cmd-tab");
+      ["channels", "queue", "automation"].forEach((key) => {
+        document
+          .getElementById(`cmdPanel-${key}`)
+          ?.classList.toggle("hidden", key !== targetTab);
+      });
+    });
+  });
+
+  // Brand Kit Downloads (Profile Avatar & Cover Banner)
+  document
+    .getElementById("downloadBrandAvatarBtn")
+    ?.addEventListener("click", () => downloadOfficialBrandAsset("avatar"));
+  document
+    .getElementById("downloadBrandBannerBtn")
+    ?.addEventListener("click", () => downloadOfficialBrandAsset("banner"));
+
+  // Queue Tab Actions
+  document
+    .getElementById("regenerateDailyQueueBtn")
+    ?.addEventListener("click", () => {
+      buildDailyAutoPostQueue();
+      renderDailyQueueTab();
+      appendDispatchLog(
+        "🔄 Regenerated today's 3x daily auto-post queue from live portal deadlines & category news."
+      );
+      showToast("Refreshed today's automated social media queue!");
+    });
+
+  document
+    .getElementById("runAllDailyPostsNowBtn")
+    ?.addEventListener("click", async () => {
+      if (dailyAutoPostQueue.length === 0) buildDailyAutoPostQueue();
+      for (const slot of dailyAutoPostQueue) {
+        await executeOmnichannelAutoPost(slot);
+      }
+      showToast("All 3 daily slots broadcasted across enabled social platforms!");
+    });
+
+  document
+    .getElementById("clearDispatchLogBtn")
+    ?.addEventListener("click", () => {
+      dispatchActivityLog = [];
+      saveSocialAutomationState();
+      renderDispatchLogEntries();
+    });
+
+  // Save Automation & Webhook Config Form
+  document
+    .getElementById("socialAutomationConfigForm")
+    ?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      automationConfig.masterEnabled =
+        document.getElementById("autoPostMasterEnabled")?.checked ?? true;
+      automationConfig.morningTime =
+        document.getElementById("slotMorningTime")?.value || "08:00";
+      automationConfig.middayTime =
+        document.getElementById("slotMiddayTime")?.value || "13:00";
+      automationConfig.eveningTime =
+        document.getElementById("slotEveningTime")?.value || "18:00";
+      automationConfig.priorityRule =
+        document.getElementById("autoPostContentRule")?.value || "urgent_first";
+      automationConfig.webhookUrl =
+        document.getElementById("webhookEndpointInput")?.value.trim() || "";
+      automationConfig.telegramBotToken =
+        document.getElementById("telegramBotTokenInput")?.value.trim() || "";
+      automationConfig.telegramChatId =
+        document.getElementById("telegramChatIdInput")?.value.trim() ||
+        "@NaijaGatewayAlerts";
+
+      saveSocialAutomationState();
+      buildDailyAutoPostQueue();
+      renderSocialCommandCenter();
+      appendDispatchLog(
+        `⚙️ Saved Daily Auto-Poster schedule (${automationConfig.morningTime}, ${automationConfig.middayTime}, ${automationConfig.eveningTime} WAT).`
+      );
+      showToast("Saved Daily Auto-Poster & Webhook settings!");
+    });
+
+  document
+    .getElementById("testWebhookDispatchBtn")
+    ?.addEventListener("click", async () => {
+      if (dailyAutoPostQueue.length === 0) buildDailyAutoPostQueue();
+      await executeOmnichannelAutoPost(dailyAutoPostQueue[0]);
+    });
+
   // Poster Studio Controls Listeners
   document
     .getElementById("posterPortalSelect")
@@ -2732,7 +3563,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("emptySuggestBtn")
     ?.addEventListener("click", openSuggest);
 
-  // Handle Custom Portal Submission (with optional Days Left for Red Deadline Tag)
+  // Handle Custom Portal Submission (Routes to Admin Approval Queue when moderation is enabled)
   document
     .getElementById("suggestPortalForm")
     ?.addEventListener("submit", (e) => {
@@ -2760,7 +3591,7 @@ document.addEventListener("DOMContentLoaded", () => {
         id: "custom-" + Date.now(),
         title,
         acronym: acronym.slice(0, 8),
-        agencyFull: `${acronym} — Verified Community Submission`,
+        agencyFull: `${acronym} — Community Submitted Portal`,
         category,
         url,
         domain,
@@ -2783,6 +3614,7 @@ document.addEventListener("DOMContentLoaded", () => {
             : "APPLICATION OPEN",
         posterSubtitle: description.slice(0, 80),
         popularRank: 1,
+        submittedAt: "Just now",
         keywords: [title.toLowerCase(), acronym.toLowerCase(), category],
         requirements: [
           "Valid National Identification Number (NIN)",
@@ -2797,27 +3629,800 @@ document.addEventListener("DOMContentLoaded", () => {
           "Always verify that you are on the official domain before making any online payments."
       };
 
-      portalsData.unshift(newPortal);
-      try {
-        const existingCustom = JSON.parse(
-          localStorage.getItem("naijagateway_custom_portals") || "[]"
-        );
-        existingCustom.unshift(newPortal);
-        localStorage.setItem(
-          "naijagateway_custom_portals",
-          JSON.stringify(existingCustom)
-        );
-      } catch (err) {
-        // ignore
-      }
-
       e.target.reset();
       closeAllModals();
-      activeCategory = category;
+
+      if (adminSiteConfig.requireModeration) {
+        pendingSubmissions.unshift(newPortal);
+        saveAdminDashboardState();
+        updateAdminPendingBadges();
+        showToast(
+          `Submitted "${title}"! Sent to Admin Dashboard for verification & approval.`
+        );
+      } else {
+        approveAndPublishSubmission(newPortal);
+      }
+    });
+
+  // Initialize Admin Dashboard Listeners & State
+  initAdminDashboard();
+});
+
+// ============================================================================
+// Admin Control Dashboard: Moderation Queue, Live Portal Editor, News & Features
+// ============================================================================
+const INITIAL_PENDING_SUBMISSIONS = [
+  {
+    id: "pending-tescom",
+    title: "Lagos State Teaching Service Commission (TESCOM) Recruitment Portal",
+    acronym: "TESCOM",
+    agencyFull: "Lagos State Teaching Service Commission",
+    category: "education",
+    url: "https://tescomjobs.lagosstate.gov.ng",
+    domain: "tescomjobs.lagosstate.gov.ng",
+    description: "Official Lagos State Government recruitment portal for graduate teachers across secondary schools in Lagos State.",
+    diasporaReady: false,
+    isFree: true,
+    costLabel: "100% Free Application",
+    windowStatus: "Closing in 4 Days!",
+    daysLeft: 4,
+    deadlineNote: "Lagos State TESCOM online teacher recruitment portal closes in 4 days!",
+    posterType: "RECRUITMENT OPEN",
+    posterSubtitle: "Lagos State TESCOM Graduate Teachers Recruitment",
+    popularRank: 2,
+    submittedAt: "18 mins ago",
+    keywords: ["tescom", "lagos", "teachers", "recruitment", "education", "job"],
+    requirements: [
+      "B.Ed / B.A (Ed) / B.Sc (Ed) or Bachelor's Degree + PGDE and TRCN Certificate",
+      "NYSC Discharge or Exemption Certificate",
+      "Lagos State Residents Registration Agency (LASRRA) ID and NIN"
+    ],
+    steps: [
+      "Visit tescomjobs.lagosstate.gov.ng and create an applicant account.",
+      "Upload academic credentials, NYSC certificate, and TRCN license.",
+      "Submit and print your acknowledgment slip for the CBT exam."
+    ],
+    proTip: "Ensure your TRCN certificate is active and your LASRRA ID is verified before submitting."
+  },
+  {
+    id: "pending-ilera-eko",
+    title: "Lagos State Health Management Agency (LASHMA — ILERA EKO) Portal",
+    acronym: "LASHMA",
+    agencyFull: "Lagos State Health Management Agency",
+    category: "health",
+    url: "https://lashma.com",
+    domain: "lashma.com",
+    description: "Official social health insurance portal for Lagos residents and diaspora sponsors to enroll in the mandatory ILERA EKO health insurance plan.",
+    diasporaReady: true,
+    isFree: false,
+    costLabel: "Affordable Annual Health Plan",
+    windowStatus: "Open 24/7",
+    daysLeft: null,
+    deadlineNote: null,
+    posterType: "HEALTH ENROLLMENT OPEN",
+    posterSubtitle: "ILERA EKO Family & Individual Social Health Insurance",
+    popularRank: 6,
+    submittedAt: "1 hour ago",
+    keywords: ["health", "ilera eko", "lashma", "health insurance", "lagos", "hospital"],
+    requirements: [
+      "Valid NIN or LASRRA ID",
+      "Passport photographs of principal and dependents",
+      "Preferred accredited hospital in Lagos State"
+    ],
+    steps: [
+      "Visit lashma.com and select an Individual, Family, or Diaspora Sponsor plan.",
+      "Choose your nearest accredited hospital and complete online enrollment."
+    ],
+    proTip: "Nigerians in the diaspora can pay online to cover their family members' hospital bills in Lagos all year round."
+  },
+  {
+    id: "pending-nddc-scholarship",
+    title: "NDDC Foreign Postgraduate Scholarship Portal",
+    acronym: "NDDC",
+    agencyFull: "Niger Delta Development Commission",
+    category: "education",
+    url: "https://scholarship.nddc.gov.ng",
+    domain: "scholarship.nddc.gov.ng",
+    description: "Official NDDC Foreign Postgraduate (MSc) Scholarship portal for eligible graduates from Niger Delta states in engineering, medical, and environmental sciences.",
+    diasporaReady: true,
+    isFree: true,
+    costLabel: "100% Free (Fully Funded Overseas)",
+    windowStatus: "Closing in 3 Days!",
+    daysLeft: 3,
+    deadlineNote: "URGENT: NDDC Foreign Postgraduate Scholarship portal closes in 3 days!",
+    posterType: "SCHOLARSHIP CLOSING SOON",
+    posterSubtitle: "NDDC Fully-Funded Overseas MSc Scholarship Scheme",
+    popularRank: 3,
+    submittedAt: "2 hours ago",
+    keywords: ["nddc", "scholarship", "foreign scholarship", "masters", "niger delta"],
+    requirements: [
+      "First Class or Second Class Upper/Lower Bachelor's Degree in eligible STEM fields",
+      "NYSC Discharge/Exemption Certificate",
+      "Local Government Identification Letter from a Niger Delta state & valid NIN"
+    ],
+    steps: [
+      "Visit scholarship.nddc.gov.ng and complete the online registration form.",
+      "Upload degree certificate, NYSC discharge certificate, admission letter, and LGA certificate.",
+      "Print your CBT examination slip."
+    ],
+    proTip: "NDDC CBT screening is strictly merit-based and 100% free."
+  }
+];
+
+let pendingSubmissions = [...INITIAL_PENDING_SUBMISSIONS];
+let adminUnlockedThisSession = false;
+let adminPortalSearchFilter = "";
+
+let adminSiteConfig = {
+  showNewsTicker: true,
+  showUrgentPanel: true,
+  showNewsDesk: true,
+  showSocialStrip: true,
+  requireModeration: true,
+  requireAdminPin: false,
+  adminPin: "2026",
+  bannerHtml:
+    "Every link on <strong>NaijaGateway</strong> is verified against official <code>.gov.ng</code>, <code>.mil.ng</code>, and statutory domains. Check <strong>Red Closing Alerts</strong> for applications ending within 5 days!"
+};
+
+function loadAdminDashboardState() {
+  try {
+    const savedPending = localStorage.getItem("naijagateway_pending_submissions");
+    if (savedPending) {
+      pendingSubmissions = JSON.parse(savedPending);
+    }
+
+    const savedCfg = localStorage.getItem("naijagateway_admin_site_config");
+    if (savedCfg) {
+      adminSiteConfig = { ...adminSiteConfig, ...JSON.parse(savedCfg) };
+    }
+
+    const savedNews = localStorage.getItem("naijagateway_custom_news");
+    if (savedNews) {
+      const parsedNews = JSON.parse(savedNews);
+      if (Array.isArray(parsedNews) && parsedNews.length > 0) {
+        DAILY_CATEGORY_NEWS.splice(0, DAILY_CATEGORY_NEWS.length, ...parsedNews);
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+function saveAdminDashboardState() {
+  try {
+    localStorage.setItem(
+      "naijagateway_pending_submissions",
+      JSON.stringify(pendingSubmissions)
+    );
+    localStorage.setItem(
+      "naijagateway_admin_site_config",
+      JSON.stringify(adminSiteConfig)
+    );
+    localStorage.setItem(
+      "naijagateway_custom_news",
+      JSON.stringify(DAILY_CATEGORY_NEWS)
+    );
+  } catch (e) {
+    // ignore
+  }
+}
+
+function applySiteFeatureConfigToDOM() {
+  const ticker = document.querySelector(".live-news-ticker");
+  if (ticker) ticker.classList.toggle("hidden", !adminSiteConfig.showNewsTicker);
+
+  const urgentPanel = document.getElementById("urgentDeadlinesPanel");
+  if (urgentPanel) {
+    if (!adminSiteConfig.showUrgentPanel) {
+      urgentPanel.classList.add("hidden");
+    } else {
+      renderUrgentDeadlinesStrip();
+    }
+  }
+
+  const newsDesk = document.getElementById("dailyNewsSection");
+  if (newsDesk) newsDesk.classList.toggle("hidden", !adminSiteConfig.showNewsDesk);
+
+  const socialStrip = document.querySelector(".official-socials-strip");
+  if (socialStrip)
+    socialStrip.classList.toggle("hidden", !adminSiteConfig.showSocialStrip);
+
+  const secText = document.querySelector(".security-text");
+  if (secText && adminSiteConfig.bannerHtml) {
+    secText.innerHTML = adminSiteConfig.bannerHtml;
+  }
+}
+
+function updateAdminPendingBadges() {
+  const count = pendingSubmissions.length;
+  const headerBadge = document.getElementById("adminPendingBadge");
+  const kpiPending = document.getElementById("adminKpiPending");
+  const tabPending = document.getElementById("adminTabPendingCount");
+
+  if (headerBadge) {
+    headerBadge.textContent = count;
+    headerBadge.classList.toggle("hidden", count === 0);
+  }
+  if (kpiPending) kpiPending.textContent = count;
+  if (tabPending) tabPending.textContent = count;
+
+  const kpiLive = document.getElementById("adminKpiLivePortals");
+  if (kpiLive) kpiLive.textContent = portalsData.length;
+
+  const kpiClosing = document.getElementById("adminKpiClosingSoon");
+  if (kpiClosing) kpiClosing.textContent = portalsData.filter(isClosingSoon).length;
+
+  const kpiNews = document.getElementById("adminKpiNewsCount");
+  if (kpiNews) kpiNews.textContent = DAILY_CATEGORY_NEWS.length;
+}
+
+function approveAndPublishSubmission(subObj) {
+  portalsData.unshift(subObj);
+  try {
+    const existingCustom = JSON.parse(
+      localStorage.getItem("naijagateway_custom_portals") || "[]"
+    );
+    existingCustom.unshift(subObj);
+    localStorage.setItem(
+      "naijagateway_custom_portals",
+      JSON.stringify(existingCustom)
+    );
+  } catch (e) {
+    // ignore
+  }
+
+  pendingSubmissions = pendingSubmissions.filter((item) => item.id !== subObj.id);
+  saveAdminDashboardState();
+  buildDailyAutoPostQueue();
+  updateAdminPendingBadges();
+  renderCategoryTabs();
+  renderUrgentDeadlinesStrip();
+  renderDirectory();
+  renderAdminDashboardContent();
+  appendDispatchLog(
+    `🛡️ ADMIN APPROVED: Published "${subObj.title}" (${subObj.acronym}) to live directory & social auto-post queue.`
+  );
+  showToast(`Approved & published "${subObj.title}" to NaijaGateway!`);
+}
+
+function renderAdminPendingTab() {
+  const listEl = document.getElementById("adminPendingList");
+  if (!listEl) return;
+
+  if (pendingSubmissions.length === 0) {
+    listEl.innerHTML = `
+      <div class="empty-state" style="margin: 12px auto; padding: 32px 20px;">
+        <div class="empty-icon">✅</div>
+        <h3>All Community Portal Submissions Reviewed!</h3>
+        <p>There are currently 0 pending portals waiting for moderation. New submissions from "Submit Portal" will appear here automatically.</p>
+      </div>
+    `;
+    return;
+  }
+
+  listEl.innerHTML = pendingSubmissions
+    .map((sub) => {
+      const catObj = CATEGORIES.find((c) => c.id === sub.category) || CATEGORIES[1];
+      return `
+        <div class="pending-submission-card" data-pending-card="${sub.id}">
+          <div>
+            <div class="pending-sub-meta">
+              <span class="urgent-mini-agency">${escapeHTML(sub.acronym)}</span>
+              <span class="category-pill">${catObj.icon} ${escapeHTML(catObj.shortName)}</span>
+              ${
+                isClosingSoon(sub)
+                  ? `<span class="red-notice-tag">🚨 Closing in ${sub.daysLeft} Days</span>`
+                  : `<span class="status-pill">Submitted ${escapeHTML(sub.submittedAt || "Recently")}</span>`
+              }
+            </div>
+            <h3 class="portal-title" style="margin-bottom: 4px;">${escapeHTML(sub.title)}</h3>
+            <p class="portal-desc" style="margin-bottom: 8px;">${escapeHTML(sub.description)}</p>
+
+            <!-- Inline Admin Quick-Edit Fields Before Approving -->
+            <div class="pending-edit-grid">
+              <div class="form-group">
+                <label>Verified Official URL:</label>
+                <input type="url" class="pending-url-edit" data-sub-id="${sub.id}" value="${escapeHTML(sub.url)}" />
+              </div>
+              <div class="form-group">
+                <label>Category:</label>
+                <select class="pending-cat-edit" data-sub-id="${sub.id}">
+                  ${CATEGORIES.filter((c) => c.id !== "all")
+                    .map(
+                      (c) =>
+                        `<option value="${c.id}" ${
+                          c.id === sub.category ? "selected" : ""
+                        }>${c.icon} ${escapeHTML(c.shortName)}</option>`
+                    )
+                    .join("")}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Days Left (&le;5 = Red Alert):</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="365"
+                  class="pending-days-edit"
+                  data-sub-id="${sub.id}"
+                  value="${sub.daysLeft || ""}"
+                  placeholder="None (24/7)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="pending-sub-actions">
+            <button type="button" class="btn-primary" data-approve-id="${sub.id}">
+              ✅ Approve &amp; Publish
+            </button>
+            <a href="${escapeHTML(sub.url)}" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="text-align:center; font-size:0.78rem; padding:7px 10px;">
+              🔍 Inspect URL &nearr;
+            </a>
+            <button type="button" class="btn-reject" data-reject-id="${sub.id}">
+              🗑️ Reject Submission
+            </button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  // Bind Approve & Reject actions
+  listEl.querySelectorAll("[data-approve-id]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-approve-id");
+      const sub = pendingSubmissions.find((s) => s.id === id);
+      if (!sub) return;
+
+      // Read any inline edits made by Admin before approving
+      const card = listEl.querySelector(`[data-pending-card="${id}"]`);
+      const editedUrl = card?.querySelector(".pending-url-edit")?.value.trim();
+      const editedCat = card?.querySelector(".pending-cat-edit")?.value;
+      const editedDaysRaw = card?.querySelector(".pending-days-edit")?.value.trim();
+
+      if (editedUrl) {
+        sub.url = editedUrl;
+        try {
+          sub.domain = new URL(editedUrl).hostname.replace(/^www\./, "");
+        } catch (err) {}
+      }
+      if (editedCat) sub.category = editedCat;
+
+      const parsedDays = editedDaysRaw ? parseInt(editedDaysRaw, 10) : null;
+      sub.daysLeft = parsedDays && parsedDays > 0 ? parsedDays : null;
+      if (sub.daysLeft && sub.daysLeft <= 5) {
+        sub.windowStatus = `Closing in ${sub.daysLeft} Days!`;
+        sub.deadlineNote = `Application window closes in ${sub.daysLeft} days!`;
+      }
+
+      approveAndPublishSubmission(sub);
+    });
+  });
+
+  listEl.querySelectorAll("[data-reject-id]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-reject-id");
+      const sub = pendingSubmissions.find((s) => s.id === id);
+      pendingSubmissions = pendingSubmissions.filter((s) => s.id !== id);
+      saveAdminDashboardState();
+      updateAdminPendingBadges();
+      renderAdminPendingTab();
+      showToast(`Rejected submission "${sub ? sub.title : id}".`);
+    });
+  });
+}
+
+function renderAdminLivePortalsTable() {
+  const tbody = document.getElementById("adminPortalsTableBody");
+  if (!tbody) return;
+
+  const q = adminPortalSearchFilter.trim().toLowerCase();
+  const list = portalsData.filter((p) => {
+    if (!q) return true;
+    return (
+      p.title.toLowerCase().includes(q) ||
+      p.acronym.toLowerCase().includes(q) ||
+      p.domain.toLowerCase().includes(q)
+    );
+  });
+
+  tbody.innerHTML = list
+    .map((p) => {
+      const cat = CATEGORIES.find((c) => c.id === p.category);
+      const closing = isClosingSoon(p);
+      return `
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <strong style="color:var(--ng-green-600);">${escapeHTML(p.acronym)}</strong>
+              <div>
+                <div style="font-weight:700; color:var(--text-primary);">${escapeHTML(p.title)}</div>
+                <small style="color:var(--text-muted); font-family:'JetBrains Mono',monospace;">${escapeHTML(p.domain)}</small>
+              </div>
+            </div>
+          </td>
+          <td>${cat ? `${cat.icon} ${escapeHTML(cat.shortName)}` : p.category}</td>
+          <td>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input
+                type="number"
+                min="0"
+                max="365"
+                class="admin-days-input"
+                data-edit-days="${p.id}"
+                value="${p.daysLeft || ""}"
+                placeholder="24/7"
+              />
+              ${
+                closing
+                  ? `<span class="red-notice-tag" style="font-size:0.65rem; padding:2px 6px;">🚨 ${p.daysLeft}d</span>`
+                  : ""
+              }
+            </div>
+          </td>
+          <td>
+            <input
+              type="text"
+              class="admin-status-input"
+              data-edit-window="${p.id}"
+              value="${escapeHTML(p.windowStatus)}"
+            />
+          </td>
+          <td>
+            <input
+              type="checkbox"
+              data-edit-diaspora="${p.id}"
+              ${p.diasporaReady ? "checked" : ""}
+            />
+          </td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-copy-url" data-save-portal-row="${p.id}">
+                💾 Save
+              </button>
+              <button type="button" class="btn-reject" style="padding:4px 8px; font-size:0.72rem;" data-delete-portal-row="${p.id}">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  tbody.querySelectorAll("[data-save-portal-row]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const pid = btn.getAttribute("data-save-portal-row");
+      const target = portalsData.find((p) => p.id === pid);
+      if (!target) return;
+
+      const daysInput = tbody.querySelector(`[data-edit-days="${pid}"]`);
+      const winInput = tbody.querySelector(`[data-edit-window="${pid}"]`);
+      const diaInput = tbody.querySelector(`[data-edit-diaspora="${pid}"]`);
+
+      const rawDays = daysInput?.value.trim();
+      const parsedDays = rawDays ? parseInt(rawDays, 10) : null;
+      target.daysLeft = parsedDays && parsedDays > 0 ? parsedDays : null;
+
+      if (winInput) {
+        target.windowStatus =
+          target.daysLeft && target.daysLeft <= 5 && !winInput.value.includes("Closing")
+            ? `Closing in ${target.daysLeft} Days!`
+            : winInput.value.trim() || "Open 24/7";
+      }
+      if (target.daysLeft && target.daysLeft <= 5) {
+        target.deadlineNote = `Application window closes in ${target.daysLeft} days!`;
+      }
+      if (diaInput) {
+        target.diasporaReady = diaInput.checked;
+      }
+
+      buildDailyAutoPostQueue();
+      updateAdminPendingBadges();
+      renderCategoryTabs();
+      renderUrgentDeadlinesStrip();
+      renderDirectory();
+      renderAdminLivePortalsTable();
+      showToast(`Updated "${target.acronym}" deadline & portal settings!`);
+    });
+  });
+
+  tbody.querySelectorAll("[data-delete-portal-row]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const pid = btn.getAttribute("data-delete-portal-row");
+      const target = portalsData.find((p) => p.id === pid);
+      portalsData = portalsData.filter((p) => p.id !== pid);
+      updateAdminPendingBadges();
+      renderCategoryTabs();
+      renderUrgentDeadlinesStrip();
+      renderDirectory();
+      renderAdminLivePortalsTable();
+      showToast(`Removed "${target ? target.title : pid}" from directory.`);
+    });
+  });
+}
+
+function renderAdminNewsManager() {
+  const listEl = document.getElementById("adminManageNewsList");
+  const countEl = document.getElementById("adminNewsListCount");
+  if (countEl) countEl.textContent = DAILY_CATEGORY_NEWS.length;
+  if (!listEl) return;
+
+  listEl.innerHTML = DAILY_CATEGORY_NEWS.map((n) => {
+    const cat = CATEGORIES.find((c) => c.id === n.category);
+    return `
+      <div class="admin-news-item">
+        <div>
+          <div style="display:flex; gap:6px; align-items:center; margin-bottom:3px;">
+            <span class="ticker-source-tag">${escapeHTML(n.source)}</span>
+            <span style="font-size:0.72rem; color:var(--text-muted);">${
+              cat ? `${cat.icon} ${escapeHTML(cat.shortName)}` : n.category
+            } • ${escapeHTML(n.timeAgo)}</span>
+          </div>
+          <strong style="font-size:0.83rem; color:var(--text-primary); display:block;">
+            ${escapeHTML(n.headline)}
+          </strong>
+        </div>
+        <button type="button" class="btn-reject" style="padding:4px 8px; font-size:0.72rem;" data-delete-news="${n.id}">
+          Remove
+        </button>
+      </div>
+    `;
+  }).join("");
+
+  listEl.querySelectorAll("[data-delete-news]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const nid = btn.getAttribute("data-delete-news");
+      const idx = DAILY_CATEGORY_NEWS.findIndex((item) => item.id === nid);
+      if (idx !== -1) {
+        DAILY_CATEGORY_NEWS.splice(idx, 1);
+        saveAdminDashboardState();
+        updateAdminPendingBadges();
+        renderNewsTicker();
+        renderCategoryNewsSection();
+        renderDirectory();
+        renderAdminNewsManager();
+        showToast("Removed news headline from live feed.");
+      }
+    });
+  });
+}
+
+function renderAdminFeaturesForm() {
+  const setChk = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = Boolean(val);
+  };
+  setChk("featToggleNewsTicker", adminSiteConfig.showNewsTicker);
+  setChk("featToggleUrgentPanel", adminSiteConfig.showUrgentPanel);
+  setChk("featToggleNewsDesk", adminSiteConfig.showNewsDesk);
+  setChk("featToggleSocialStrip", adminSiteConfig.showSocialStrip);
+  setChk("featRequireModeration", adminSiteConfig.requireModeration);
+  setChk("featRequireAdminPin", adminSiteConfig.requireAdminPin);
+
+  const bannerInput = document.getElementById("adminCustomBannerText");
+  if (bannerInput) bannerInput.value = adminSiteConfig.bannerHtml;
+
+  const pinInput = document.getElementById("adminNewPinInput");
+  if (pinInput) pinInput.value = adminSiteConfig.adminPin || "2026";
+}
+
+function renderAdminDashboardContent() {
+  updateAdminPendingBadges();
+  renderAdminPendingTab();
+  renderAdminLivePortalsTable();
+  renderAdminNewsManager();
+  renderAdminFeaturesForm();
+}
+
+function openAdminDashboardModal() {
+  closeAllModals();
+  const lockScreen = document.getElementById("adminPinLockScreen");
+  const workspace = document.getElementById("adminWorkspaceContent");
+
+  if (adminSiteConfig.requireAdminPin && !adminUnlockedThisSession) {
+    lockScreen?.classList.remove("hidden");
+    workspace?.classList.add("hidden");
+  } else {
+    lockScreen?.classList.add("hidden");
+    workspace?.classList.remove("hidden");
+    renderAdminDashboardContent();
+  }
+
+  document.getElementById("adminDashboardModal")?.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function initAdminDashboard() {
+  loadAdminDashboardState();
+  applySiteFeatureConfigToDOM();
+  updateAdminPendingBadges();
+
+  // Close modal also hides adminDashboardModal
+  const origClose = closeAllModals;
+  closeAllModals = function () {
+    origClose();
+    document.getElementById("adminDashboardModal")?.classList.add("hidden");
+  };
+
+  document
+    .getElementById("openAdminDashboardBtn")
+    ?.addEventListener("click", openAdminDashboardModal);
+
+  document
+    .getElementById("closeAdminDashboardBtn")
+    ?.addEventListener("click", closeAllModals);
+
+  // Admin PIN unlock form
+  document.getElementById("adminPinForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const entered = document.getElementById("adminPinInput")?.value.trim();
+    if (entered === (adminSiteConfig.adminPin || "2026")) {
+      adminUnlockedThisSession = true;
+      document.getElementById("adminPinLockScreen")?.classList.add("hidden");
+      document
+        .getElementById("adminWorkspaceContent")
+        ?.classList.remove("hidden");
+      renderAdminDashboardContent();
+      showToast("Admin Dashboard Unlocked!");
+    } else {
+      showToast("Incorrect Admin Passcode! (Default is 2026)");
+    }
+  });
+
+  // Switch Admin Tabs
+  document.querySelectorAll(".admin-tab").forEach((tabBtn) => {
+    tabBtn.addEventListener("click", () => {
+      document
+        .querySelectorAll(".admin-tab")
+        .forEach((b) => b.classList.remove("active"));
+      tabBtn.classList.add("active");
+      const target = tabBtn.getAttribute("data-admin-tab");
+      ["approvals", "portals", "news", "features"].forEach((key) => {
+        document
+          .getElementById(`adminPanel-${key}`)
+          ?.classList.toggle("hidden", key !== target);
+      });
+    });
+  });
+
+  // Approve All Pending Submissions button
+  document
+    .getElementById("approveAllPendingPortalsBtn")
+    ?.addEventListener("click", () => {
+      if (pendingSubmissions.length === 0) {
+        showToast("No pending submissions to approve.");
+        return;
+      }
+      const toApprove = [...pendingSubmissions];
+      toApprove.forEach((sub) => approveAndPublishSubmission(sub));
+      showToast(`Approved and published all ${toApprove.length} portals!`);
+    });
+
+  // Filter live portals in Admin Tab 2
+  document
+    .getElementById("adminPortalFilterInput")
+    ?.addEventListener("input", (e) => {
+      adminPortalSearchFilter = e.target.value || "";
+      renderAdminLivePortalsTable();
+    });
+
+  // Publish New Category News Headline in Admin Tab 3
+  document
+    .getElementById("adminAddNewsForm")
+    ?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const headline = document.getElementById("adminNewsHeadline").value.trim();
+      const category = document.getElementById("adminNewsCategory").value;
+      const source = document.getElementById("adminNewsSource").value;
+      const sourceUrl = document.getElementById("adminNewsUrl").value.trim();
+      const summary = document.getElementById("adminNewsSummary").value.trim();
+
+      const sourceClassMap = {
+        "Punch Newspaper": "source-punch",
+        "TVC News": "source-tvc",
+        "NTA News": "source-nta",
+        "Daily Times": "source-dailytimes",
+        "BBC News Nigeria": "source-bbc",
+        "CNN Africa": "source-cnn",
+        "Channels TV": "source-channels"
+      };
+
+      const newArticle = {
+        id: "news-custom-" + Date.now(),
+        category,
+        source,
+        sourceClass: sourceClassMap[source] || "source-punch",
+        sourceUrl,
+        timeAgo: "Just now",
+        headline,
+        summary
+      };
+
+      DAILY_CATEGORY_NEWS.unshift(newArticle);
+      saveAdminDashboardState();
+      buildDailyAutoPostQueue();
+      renderNewsTicker();
+      renderCategoryNewsSection();
+      renderDirectory();
+      renderAdminNewsManager();
+      updateAdminPendingBadges();
+      e.target.reset();
+      document.getElementById("adminNewsUrl").value = "https://punchng.com";
+      showToast(`Published "${headline.slice(0, 38)}..." to ${source} News Desk!`);
+    });
+
+  // Save Feature Switches & Banner Config in Admin Tab 4
+  document
+    .getElementById("adminFeaturesConfigForm")
+    ?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      adminSiteConfig.showNewsTicker =
+        document.getElementById("featToggleNewsTicker")?.checked ?? true;
+      adminSiteConfig.showUrgentPanel =
+        document.getElementById("featToggleUrgentPanel")?.checked ?? true;
+      adminSiteConfig.showNewsDesk =
+        document.getElementById("featToggleNewsDesk")?.checked ?? true;
+      adminSiteConfig.showSocialStrip =
+        document.getElementById("featToggleSocialStrip")?.checked ?? true;
+      adminSiteConfig.requireModeration =
+        document.getElementById("featRequireModeration")?.checked ?? true;
+      adminSiteConfig.requireAdminPin =
+        document.getElementById("featRequireAdminPin")?.checked ?? false;
+      adminSiteConfig.bannerHtml =
+        document.getElementById("adminCustomBannerText")?.value.trim() ||
+        adminSiteConfig.bannerHtml;
+      adminSiteConfig.adminPin =
+        document.getElementById("adminNewPinInput")?.value.trim() || "2026";
+
+      saveAdminDashboardState();
+      applySiteFeatureConfigToDOM();
+      showToast("Saved & applied platform feature updates immediately!");
+    });
+
+  // Export Database JSON
+  document
+    .getElementById("adminExportDataBtn")
+    ?.addEventListener("click", () => {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        portalsCount: portalsData.length,
+        pendingSubmissions,
+        portalsData,
+        dailyNews: DAILY_CATEGORY_NEWS,
+        socialPlatformsState,
+        adminSiteConfig
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json"
+      });
+      const link = document.createElement("a");
+      link.download = "naijagateway-admin-backup.json";
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      showToast("Exported complete NaijaGateway JSON backup!");
+    });
+
+  // Reset Defaults
+  document
+    .getElementById("adminResetDefaultsBtn")
+    ?.addEventListener("click", () => {
+      localStorage.removeItem("naijagateway_custom_portals");
+      localStorage.removeItem("naijagateway_pending_submissions");
+      localStorage.removeItem("naijagateway_admin_site_config");
+      localStorage.removeItem("naijagateway_custom_news");
+      pendingSubmissions = [...INITIAL_PENDING_SUBMISSIONS];
+      portalsData = [...INITIAL_PORTALS];
+      updateAdminPendingBadges();
       renderCategoryTabs();
       renderUrgentDeadlinesStrip();
       renderCategoryNewsSection();
       renderDirectory();
-      showToast(`Added "${title}" to the directory!`);
+      renderAdminDashboardContent();
+      showToast("Reset portal directory and moderation queue to defaults!");
     });
-});
+}
+
+

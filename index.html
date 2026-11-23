@@ -76,12 +76,22 @@
           <span>Poster Studio</span>
         </button>
 
+        <button type="button" class="btn-social-command" id="openSocialCommandHeaderBtn" title="Manage All 7 Official Social Media Channels & Daily Auto-Poster">
+          <span class="pulse-dot"></span>
+          <span>Social Auto-Poster</span>
+        </button>
+
         <button type="button" class="btn-secondary" id="suggestPortalBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
           <span>Submit Portal</span>
+        </button>
+
+        <button type="button" class="btn-admin-dash" id="openAdminDashboardBtn" title="Open Admin Control Dashboard & Approve Submitted Portals">
+          <span>🛡️ Admin</span>
+          <span class="pending-badge" id="adminPendingBadge">3</span>
         </button>
 
         <button type="button" class="theme-toggle" id="themeToggleBtn" aria-label="Toggle dark mode" title="Toggle Light/Dark Mode">
@@ -302,6 +312,25 @@
           <h3>Social Media Job &amp; Application Posters</h3>
           <p>Click <strong>"Share Job Poster"</strong> on any portal to generate a high-resolution graphic flyer with verified domain, requirements, and deadline — ready for WhatsApp, X, Facebook, LinkedIn, or Instagram.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Official NaijaGateway Social Media Channels Strip -->
+  <section class="official-socials-strip">
+    <div class="container">
+      <div class="socials-strip-header">
+        <div>
+          <span class="news-live-pill">📡 OFFICIAL NAIJAGATEWAY CHANNELS</span>
+          <h3 class="socials-strip-title">Follow &amp; Receive Daily Auto-Posted Recruitment, Scholarship &amp; Deadline Alerts</h3>
+          <p class="socials-strip-sub">Our automated broadcast engine publishes verified portal openings, red closing-soon alerts (&le;5 days), and trusted news every day at 08:00 AM, 01:00 PM &amp; 06:00 PM WAT.</p>
+        </div>
+        <button type="button" class="btn-primary" id="openSocialCommandBannerBtn">
+          ⚡ Open Social Auto-Poster Command Center
+        </button>
+      </div>
+      <div class="official-channels-grid" id="publicSocialChannelsBar">
+        <!-- Populated dynamically by app.js with all 7 official social media platforms -->
       </div>
     </div>
   </section>
@@ -659,6 +688,451 @@
             <button type="submit" class="btn-primary">Add Portal to Directory</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 5: Social Media Command Center & Daily Auto-Poster Engine
+       ======================================================================== -->
+  <div id="socialCommandModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="socialCommandTitle">
+    <div class="modal-card modal-social-command">
+      <div class="modal-header">
+        <div class="modal-header-meta">
+          <span class="category-pill">📡 Omnichannel Social Media Command Center</span>
+          <span class="status-pill status-online" id="autopilotStatusPill">
+            <span class="status-dot"></span> Daily Auto-Poster: ACTIVE (3x Daily WAT)
+          </span>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeSocialCommandBtn" aria-label="Close social command center">&times;</button>
+      </div>
+
+      <!-- Command Center Navigation Tabs -->
+      <div class="command-tabs-bar">
+        <button type="button" class="cmd-tab active" data-cmd-tab="channels">
+          🌐 1. Official Social Platforms (7) &amp; Brand Kit
+        </button>
+        <button type="button" class="cmd-tab" data-cmd-tab="queue">
+          📅 2. Today's Auto-Post Queue &amp; Live Dispatch
+        </button>
+        <button type="button" class="cmd-tab" data-cmd-tab="automation">
+          ⚙️ 3. Daily Auto-Schedule, Webhooks &amp; API Setup
+        </button>
+      </div>
+
+      <div class="modal-body social-command-body">
+        <!-- TAB 1: All 7 Official Social Media Platforms & Brand Kit Generator -->
+        <div class="cmd-tab-panel" id="cmdPanel-channels">
+          <div class="cmd-panel-intro">
+            <div>
+              <h2 id="socialCommandTitle" class="poster-studio-heading">NaijaGateway Official Social Media Ecosystem</h2>
+              <p class="poster-studio-sub">
+                All 7 official social media profiles configured with unified handles, bios, and daily automated broadcast connections. Toggle any platform into the daily auto-post rotation or download official brand assets below.
+              </p>
+            </div>
+            <div class="brand-kit-actions">
+              <button type="button" class="btn-secondary" id="downloadBrandAvatarBtn" title="Download 800x800 Official Profile Logo PNG">
+                🖼️ Download Profile Logo (PNG)
+              </button>
+              <button type="button" class="btn-secondary" id="downloadBrandBannerBtn" title="Download 1500x500 Official Cover Banner PNG">
+                🏞️ Download Cover Banner (PNG)
+              </button>
+            </div>
+          </div>
+
+          <!-- Hidden Canvas for Generating Official Brand Avatar & Cover Banner -->
+          <canvas id="brandKitCanvas" width="1500" height="500" class="hidden"></canvas>
+
+          <div class="social-accounts-grid" id="socialAccountsManagerGrid">
+            <!-- Populated by app.js for X, Facebook, WhatsApp Channel, Telegram Channel, Instagram, TikTok, LinkedIn -->
+          </div>
+        </div>
+
+        <!-- TAB 2: Today's Daily Auto-Post Queue & Live Broadcast Log -->
+        <div class="cmd-tab-panel hidden" id="cmdPanel-queue">
+          <div class="cmd-panel-intro">
+            <div>
+              <h2 class="poster-studio-heading">Today's Automated Multi-Channel Broadcast Queue</h2>
+              <p class="poster-studio-sub">
+                Every day, the Auto-Poster compiles a <strong>Morning Urgent Deadline Roundup (08:00 WAT)</strong>, <strong>Midday Trusted News Digest (13:00 WAT)</strong>, and <strong>Evening Featured Portal Spotlight (18:00 WAT)</strong> with auto-generated 1080&times;1080 posters.
+              </p>
+            </div>
+            <div class="queue-global-actions">
+              <button type="button" class="btn-secondary" id="regenerateDailyQueueBtn">
+                🔄 Refresh Today's Queue
+              </button>
+              <button type="button" class="btn-primary" id="runAllDailyPostsNowBtn">
+                🚀 Auto-Post All Queued Slots Now
+              </button>
+            </div>
+          </div>
+
+          <div class="daily-queue-list" id="dailyAutoPostQueueList">
+            <!-- Populated dynamically by app.js -->
+          </div>
+
+          <!-- Live Dispatch History Log -->
+          <div class="dispatch-log-box">
+            <div class="dispatch-log-header">
+              <strong>📡 Live Auto-Post Activity &amp; Dispatch Log</strong>
+              <button type="button" class="btn-copy-url" id="clearDispatchLogBtn">Clear Log</button>
+            </div>
+            <div class="dispatch-log-entries" id="dispatchLogEntries">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Daily Auto-Schedule, Webhooks (Make / Zapier / Buffer) & Direct API Keys -->
+        <div class="cmd-tab-panel hidden" id="cmdPanel-automation">
+          <h2 class="poster-studio-heading">Daily Autopilot Schedule &amp; API / Webhook Connections</h2>
+          <p class="poster-studio-sub">
+            Connect your <strong>Telegram Bot API</strong>, <strong>Make.com / Zapier / n8n / Buffer Webhook URL</strong>, or <strong>Meta / X API Webhook</strong> below so clicking "Auto-Post" or running on schedule dispatches live JSON + Poster payloads straight to your social channels.
+          </p>
+
+          <form id="socialAutomationConfigForm" class="suggest-form">
+            <div class="automation-settings-grid">
+              <!-- Schedule Card -->
+              <div class="guide-panel">
+                <h3 class="guide-heading">⏰ Daily Autopilot Schedule (WAT / UTC+1)</h3>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="autoPostMasterEnabled" checked />
+                    <span>Enable Daily Automated Social Media Posting (3x Daily)</span>
+                  </label>
+                </div>
+                <div class="form-row" style="margin-top: 10px;">
+                  <div class="form-group">
+                    <label for="slotMorningTime">Morning Deadline Alert:</label>
+                    <input type="time" id="slotMorningTime" value="08:00" />
+                  </div>
+                  <div class="form-group">
+                    <label for="slotMiddayTime">Midday Daily News Digest:</label>
+                    <input type="time" id="slotMiddayTime" value="13:00" />
+                  </div>
+                </div>
+                <div class="form-row" style="margin-top: 10px;">
+                  <div class="form-group">
+                    <label for="slotEveningTime">Evening Recruitment Spotlight:</label>
+                    <input type="time" id="slotEveningTime" value="18:00" />
+                  </div>
+                  <div class="form-group">
+                    <label for="autoPostContentRule">Priority Rule:</label>
+                    <select id="autoPostContentRule">
+                      <option value="urgent_first">🚨 Urgent Deadlines (&le;5 Days) + News + Recruitment</option>
+                      <option value="all_categories">Rotate All 9 Categories Equally</option>
+                      <option value="security_education">Focus on Scholarships, NYSC &amp; Security Jobs</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Webhook & Direct API Card -->
+              <div class="guide-panel">
+                <h3 class="guide-heading">🔌 Live API &amp; Webhook Integrations</h3>
+                <div class="form-group">
+                  <label for="webhookEndpointInput">Omnichannel Webhook URL (Make.com / Zapier / Buffer / n8n):</label>
+                  <input type="url" id="webhookEndpointInput" placeholder="https://hook.eu1.make.com/... or https://hooks.zapier.com/..." />
+                  <small style="color: var(--text-muted); font-size: 0.73rem;">Receives JSON payload with caption, official URL, category, deadline days, and base64 PNG poster for X, Facebook, Instagram, LinkedIn, TikTok &amp; WhatsApp.</small>
+                </div>
+                <div class="form-row" style="margin-top: 8px;">
+                  <div class="form-group">
+                    <label for="telegramBotTokenInput">Telegram Bot Token (Direct Auto-Post):</label>
+                    <input type="password" id="telegramBotTokenInput" placeholder="123456789:ABCdefGHIjklMNO..." />
+                  </div>
+                  <div class="form-group">
+                    <label for="telegramChatIdInput">Telegram Channel ID:</label>
+                    <input type="text" id="telegramChatIdInput" value="@NaijaGatewayAlerts" placeholder="@NaijaGatewayAlerts" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-footer" style="margin-top: 14px;">
+              <button type="button" class="btn-secondary" id="testWebhookDispatchBtn">
+                🧪 Send Test Auto-Post Payload Now
+              </button>
+              <button type="submit" class="btn-primary">
+                💾 Save Automation &amp; Schedule Settings
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 6: Admin Control Dashboard (Approve Submissions, Manage Portals, News & Features)
+       ======================================================================== -->
+  <div id="adminDashboardModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="adminDashboardTitle">
+    <div class="modal-card modal-admin-dashboard">
+      <div class="modal-header">
+        <div class="modal-header-meta">
+          <span class="category-pill">🛡️ NaijaGateway Admin Control Panel</span>
+          <span class="status-pill status-online" id="adminAuthStatusPill">
+            <span class="status-dot"></span> Admin Session Active
+          </span>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeAdminDashboardBtn" aria-label="Close admin dashboard">&times;</button>
+      </div>
+
+      <!-- Admin PIN Unlock Screen (Default PIN: 2026) -->
+      <div id="adminPinLockScreen" class="modal-body admin-lock-screen hidden">
+        <div class="admin-lock-box">
+          <div class="empty-icon">🔐</div>
+          <h2 class="modal-title">Admin Verification Required</h2>
+          <p class="modal-description" style="margin-top: 6px;">
+            Enter your Admin Security Passcode to approve community-submitted portals, edit red deadline timers, publish daily category news, or toggle site features.
+          </p>
+          <form id="adminPinForm" class="admin-pin-form">
+            <input
+              type="password"
+              id="adminPinInput"
+              class="admin-pin-input"
+              placeholder="Enter Admin Passcode (Default: 2026)"
+              autocomplete="off"
+              required
+            />
+            <button type="submit" class="btn-primary">Unlock Admin Dashboard &rarr;</button>
+          </form>
+          <small style="color: var(--text-muted); display: block; margin-top: 10px;">
+            Default Admin Passcode: <code>2026</code> (You can change this inside the Feature Controls tab).
+          </small>
+        </div>
+      </div>
+
+      <!-- Main Admin Dashboard Workspace -->
+      <div id="adminWorkspaceContent">
+        <!-- Admin Top KPI Summary Bar -->
+        <div class="admin-kpi-bar">
+          <div class="admin-kpi-item">
+            <span class="admin-kpi-num" id="adminKpiPending">3</span>
+            <span class="admin-kpi-label">⏳ Pending Portal Approvals</span>
+          </div>
+          <div class="admin-kpi-item">
+            <span class="admin-kpi-num" id="adminKpiLivePortals">25</span>
+            <span class="admin-kpi-label">✅ Live Verified Portals</span>
+          </div>
+          <div class="admin-kpi-item">
+            <span class="admin-kpi-num" id="adminKpiClosingSoon">9</span>
+            <span class="admin-kpi-label">🚨 Red Alert Deadlines (&le;5d)</span>
+          </div>
+          <div class="admin-kpi-item">
+            <span class="admin-kpi-num" id="adminKpiNewsCount">19</span>
+            <span class="admin-kpi-label">📰 Active News Headlines</span>
+          </div>
+        </div>
+
+        <!-- Admin Navigation Tabs -->
+        <div class="command-tabs-bar">
+          <button type="button" class="admin-tab active" data-admin-tab="approvals">
+            📥 1. Approve Submitted Portals (<span id="adminTabPendingCount">3</span>)
+          </button>
+          <button type="button" class="admin-tab" data-admin-tab="portals">
+            🗂️ 2. Manage Live Portals &amp; Deadlines
+          </button>
+          <button type="button" class="admin-tab" data-admin-tab="news">
+            📰 3. Publish &amp; Edit Category News
+          </button>
+          <button type="button" class="admin-tab" data-admin-tab="features">
+            🎛️ 4. Platform Feature Toggles &amp; Security
+          </button>
+        </div>
+
+        <div class="modal-body admin-dashboard-body">
+          <!-- ADMIN TAB 1: Pending Portal Submissions Queue ("Add or Suggest a Nigerian Portal") -->
+          <div class="admin-tab-panel" id="adminPanel-approvals">
+            <div class="cmd-panel-intro">
+              <div>
+                <h2 id="adminDashboardTitle" class="poster-studio-heading">Pending Community Portal Submissions</h2>
+                <p class="poster-studio-sub">
+                  Whenever a user fills out <strong>"Add or Suggest a Nigerian Portal"</strong>, it lands here for verification. Verify the official <code>.gov.ng</code> or statutory URL, set optional deadline days, and click <strong>"✅ Approve &amp; Publish"</strong> to push it live to the directory and social media queue.
+                </p>
+              </div>
+              <div class="brand-kit-actions">
+                <button type="button" class="btn-primary" id="approveAllPendingPortalsBtn">
+                  ✅ Approve All Pending Submissions
+                </button>
+              </div>
+            </div>
+
+            <div id="adminPendingList" class="admin-submissions-list">
+              <!-- Populated dynamically by app.js -->
+            </div>
+          </div>
+
+          <!-- ADMIN TAB 2: Manage Live Portals, Red Deadline Countdown & Quick Add -->
+          <div class="admin-tab-panel hidden" id="adminPanel-portals">
+            <div class="cmd-panel-intro">
+              <div>
+                <h2 class="poster-studio-heading">Manage Live Portals &amp; Red Closing-Soon Alerts</h2>
+                <p class="poster-studio-sub">
+                  Update the <strong>Days Left</strong> countdown for any portal (setting 1–5 days automatically activates the <strong>🚨 Red Closing Soon Tag</strong>), toggle <strong>Diaspora Ready</strong> or <strong>100% Free</strong> status, or delete outdated listings.
+                </p>
+              </div>
+              <div class="brand-kit-actions">
+                <input
+                  type="search"
+                  id="adminPortalFilterInput"
+                  class="toolbar-select"
+                  placeholder="Filter portals by name or acronym..."
+                  style="min-width: 240px;"
+                />
+              </div>
+            </div>
+
+            <div class="admin-table-wrapper">
+              <table class="admin-portals-table">
+                <thead>
+                  <tr>
+                    <th>Agency / Portal Title</th>
+                    <th>Category</th>
+                    <th>Days to Deadline (&le;5 = Red Tag)</th>
+                    <th>Status Label</th>
+                    <th>Diaspora</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminPortalsTableBody">
+                  <!-- Populated dynamically by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ADMIN TAB 3: Publish & Manage Daily Verified Category News -->
+          <div class="admin-tab-panel hidden" id="adminPanel-news">
+            <div class="automation-settings-grid">
+              <!-- Add Breaking News Form -->
+              <div class="guide-panel">
+                <h3 class="guide-heading">📰 Publish New Daily Category Headline</h3>
+                <form id="adminAddNewsForm" class="suggest-form">
+                  <div class="form-group">
+                    <label for="adminNewsHeadline">News Headline *</label>
+                    <input type="text" id="adminNewsHeadline" required placeholder="e.g., NELFUND opens student loan application portal for 2026/2027 academic session" />
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="adminNewsCategory">Target Category *</label>
+                      <select id="adminNewsCategory" required>
+                        <option value="identity">🛂 Identity, Passport &amp; Voters</option>
+                        <option value="education">🎓 Education, Scholarships &amp; NYSC</option>
+                        <option value="finance">🏠 Loans, House Mortgages &amp; Grants</option>
+                        <option value="security">🛡️ Military, Paramilitary &amp; Security</option>
+                        <option value="transport">🚗 Driving License &amp; Vehicles</option>
+                        <option value="health">🏥 Health Insurance &amp; Medical</option>
+                        <option value="business">💼 Business, Tax &amp; Pensions</option>
+                        <option value="sports">⚽ Sports, Youth &amp; Institutes</option>
+                        <option value="diaspora">🌍 Diaspora &amp; Consular</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="adminNewsSource">Trusted Media Source *</label>
+                      <select id="adminNewsSource" required>
+                        <option value="Punch Newspaper">Punch Newspaper</option>
+                        <option value="TVC News">TVC News</option>
+                        <option value="NTA News">NTA News</option>
+                        <option value="Daily Times">Daily Times</option>
+                        <option value="BBC News Nigeria">BBC News Nigeria</option>
+                        <option value="CNN Africa">CNN Africa</option>
+                        <option value="Channels TV">Channels TV</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="adminNewsUrl">Article / Source URL *</label>
+                    <input type="url" id="adminNewsUrl" value="https://punchng.com" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="adminNewsSummary">Brief Summary *</label>
+                    <textarea id="adminNewsSummary" rows="3" required placeholder="Write a 1-2 sentence verified summary for citizens..."></textarea>
+                  </div>
+                  <button type="submit" class="btn-primary">📢 Publish News to Category &amp; Live Ticker</button>
+                </form>
+              </div>
+
+              <!-- Existing News List -->
+              <div class="guide-panel">
+                <h3 class="guide-heading">📋 Live Category News Feed (<span id="adminNewsListCount">19</span>)</h3>
+                <div id="adminManageNewsList" class="admin-news-manage-list">
+                  <!-- Populated by app.js -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ADMIN TAB 4: Platform Feature Toggles, Announcement Banner & Security Passcode -->
+          <div class="admin-tab-panel hidden" id="adminPanel-features">
+            <h2 class="poster-studio-heading">Update Platform Features &amp; Site Configuration</h2>
+            <p class="poster-studio-sub">
+              Toggle major website sections on or off instantly, customize the top security announcement text, require admin approval for community submissions, or export/reset your database.
+            </p>
+
+            <form id="adminFeaturesConfigForm" class="suggest-form">
+              <div class="automation-settings-grid">
+                <div class="guide-panel">
+                  <h3 class="guide-heading">🎛️ Live Feature Switches</h3>
+                  <div class="admin-switches-list">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="featToggleNewsTicker" checked />
+                      <span>Show Top Live Daily News Ticker Bar</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="featToggleUrgentPanel" checked />
+                      <span>Show Red "Closing Soon (&le;5 Days)" Alert Panel</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="featToggleNewsDesk" checked />
+                      <span>Show Daily Category News Desk Section</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="featToggleSocialStrip" checked />
+                      <span>Show Official Social Media Channels Strip</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="featRequireModeration" checked />
+                      <span>Hold "Submit Portal" Submissions for Admin Approval First</span>
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="featRequireAdminPin" />
+                      <span>Require Admin Passcode (PIN) Before Opening Admin Dashboard</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="guide-panel">
+                  <h3 class="guide-heading">📢 Top Banner Notice &amp; Admin Passcode</h3>
+                  <div class="form-group">
+                    <label for="adminCustomBannerText">Top Security Banner Message:</label>
+                    <textarea id="adminCustomBannerText" rows="3"></textarea>
+                  </div>
+                  <div class="form-row" style="margin-top: 8px;">
+                    <div class="form-group">
+                      <label for="adminNewPinInput">Admin Passcode (PIN):</label>
+                      <input type="text" id="adminNewPinInput" value="2026" placeholder="e.g., 2026" />
+                    </div>
+                    <div class="form-group">
+                      <label>Database Backup / Reset:</label>
+                      <div style="display: flex; gap: 6px;">
+                        <button type="button" class="btn-secondary" id="adminExportDataBtn" style="flex: 1;">
+                          ⬇️ Export JSON
+                        </button>
+                        <button type="button" class="btn-secondary" id="adminResetDefaultsBtn" style="flex: 1;">
+                          🔄 Reset Defaults
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-footer" style="margin-top: 14px;">
+                <button type="submit" class="btn-primary">💾 Save &amp; Apply Feature Updates Immediately</button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
