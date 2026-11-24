@@ -3563,7 +3563,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("emptySuggestBtn")
     ?.addEventListener("click", openSuggest);
 
-  // Handle Custom Portal Submission (Routes to Admin Approval Queue when moderation is enabled)
+  // Handle Custom Portal Submission (Smart Auto-Verification: Verified domains post automatically; unverified/unknown stay in Pending)
   document
     .getElementById("suggestPortalForm")
     ?.addEventListener("submit", (e) => {
@@ -3582,16 +3582,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let domain = url;
       try {
-        domain = new URL(url).hostname.replace(/^www\./, "");
+        domain = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
       } catch (err) {
         // fallback
       }
+
+      const verificationResult = checkDomainVerificationStatus(domain, url);
 
       const newPortal = {
         id: "custom-" + Date.now(),
         title,
         acronym: acronym.slice(0, 8),
-        agencyFull: `${acronym} — Community Submitted Portal`,
+        agencyFull: verificationResult.isVerified
+          ? `${acronym} — Verified Official Portal (${verificationResult.badgeLabel})`
+          : `${acronym} — Unverified Community Submission`,
         category,
         url,
         domain,
@@ -3615,6 +3619,7 @@ document.addEventListener("DOMContentLoaded", () => {
         posterSubtitle: description.slice(0, 80),
         popularRank: 1,
         submittedAt: "Just now",
+        verificationReason: verificationResult.reason,
         keywords: [title.toLowerCase(), acronym.toLowerCase(), category],
         requirements: [
           "Valid National Identification Number (NIN)",
@@ -3632,15 +3637,25 @@ document.addEventListener("DOMContentLoaded", () => {
       e.target.reset();
       closeAllModals();
 
-      if (adminSiteConfig.requireModeration) {
+      // Rule: Any verified portal is posted automatically; only unverified links or posts from unknown portals stay under pending!
+      if (verificationResult.isVerified || !adminSiteConfig.requireModeration) {
+        approveAndPublishSubmission(newPortal, true);
+        activeCategory = category;
+        renderCategoryTabs();
+        renderDirectory();
+        showToast(
+          `✅ Verified Domain (${domain})! "${title}" was published automatically to NaijaGateway & Social Queue.`
+        );
+      } else {
         pendingSubmissions.unshift(newPortal);
         saveAdminDashboardState();
         updateAdminPendingBadges();
-        showToast(
-          `Submitted "${title}"! Sent to Admin Dashboard for verification & approval.`
+        appendDispatchLog(
+          `⚠️ HELD IN PENDING: "${title}" (${domain}) is from an unverified/unknown domain and requires Admin review.`
         );
-      } else {
-        approveAndPublishSubmission(newPortal);
+        showToast(
+          `⚠️ Unverified domain (${domain})! Held in Admin Pending Queue for manual safety review.`
+        );
       }
     });
 
@@ -3649,18 +3664,114 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ============================================================================
-// Admin Control Dashboard: Moderation Queue, Live Portal Editor, News & Features
+// Smart Official Domain Verification Engine & Admin Control Dashboard
 // ============================================================================
-const INITIAL_PENDING_SUBMISSIONS = [
+
+// Known statutory & official Nigerian institutional domains that do not end in .gov.ng
+const WHITELISTED_STATUTORY_DOMAINS = new Set([
+  "inecnigeria.org",
+  "cvr.inecnigeria.org",
+  "nigeriadriverslicence.org",
+  "cdcfib.career",
+  "boi.ng",
+  "credicorp.ng",
+  "smedanregister.ng",
+  "joinnigeriannavy.com",
+  "birthattestation.com",
+  "thenff.com",
+  "nibss-plc.com.ng",
+  "waecdirect.org",
+  "neco.gov.ng",
+  "nbte.gov.ng",
+  "nuc.edu.ng",
+  "tetfund.gov.ng",
+  "cbn.gov.ng",
+  "ndic.gov.ng",
+  "efcc.gov.ng",
+  "icpc.gov.ng"
+]);
+
+/**
+ * Checks whether a submitted URL/domain belongs to a verified Nigerian government,
+ * military, academic, or statutory institution.
+ * - Verified domains (.gov.ng, .mil.ng, .edu.ng, .org.ng, or whitelisted statutory portals) -> Auto-Published!
+ * - Unknown / unverified third-party domains (.com, .net, .xyz, blogspot, bit.ly, etc.) -> Held in Pending!
+ */
+function checkDomainVerificationStatus(domain, rawUrl) {
+  const cleanDomain = String(domain || "")
+    .toLowerCase()
+    .replace(/^www\./, "")
+    .trim();
+
+  if (!cleanDomain || !rawUrl || !rawUrl.startsWith("https://")) {
+    return {
+      isVerified: false,
+      badgeLabel: "Unverified HTTP / Invalid URL",
+      reason: "Uses insecure HTTP or invalid domain format — requires manual Admin inspection."
+    };
+  }
+
+  if (cleanDomain.endsWith(".gov.ng")) {
+    return {
+      isVerified: true,
+      badgeLabel: "Official .gov.ng Government Domain",
+      reason: "Verified Federal/State Government (.gov.ng) domain."
+    };
+  }
+
+  if (cleanDomain.endsWith(".mil.ng")) {
+    return {
+      isVerified: true,
+      badgeLabel: "Official .mil.ng Military Domain",
+      reason: "Verified Nigerian Armed Forces (.mil.ng) domain."
+    };
+  }
+
+  if (cleanDomain.endsWith(".edu.ng")) {
+    return {
+      isVerified: true,
+      badgeLabel: "Official .edu.ng Academic Institution",
+      reason: "Verified Nigerian Tertiary Institution (.edu.ng) domain."
+    };
+  }
+
+  if (cleanDomain.endsWith(".org.ng")) {
+    return {
+      isVerified: true,
+      badgeLabel: "Official .org.ng Statutory Organization",
+      reason: "Verified Nigerian Statutory Organization (.org.ng) domain."
+    };
+  }
+
+  // Check exact match or subdomain match against whitelisted statutory portals
+  for (const trusted of WHITELISTED_STATUTORY_DOMAINS) {
+    if (cleanDomain === trusted || cleanDomain.endsWith("." + trusted)) {
+      return {
+        isVerified: true,
+        badgeLabel: "Whitelisted Statutory Portal",
+        reason: `Recognized statutory Nigerian institutional domain (${trusted}).`
+      };
+    }
+  }
+
+  return {
+    isVerified: false,
+    badgeLabel: "Unverified / Unknown Domain",
+    reason: `Unknown non-government domain (${cleanDomain}) — held in Pending to prevent phishing/touts.`
+  };
+}
+
+// Verified portals (TESCOM .gov.ng & NDDC .gov.ng) are auto-published directly into the live directory!
+INITIAL_PORTALS.push(
   {
-    id: "pending-tescom",
+    id: "lagos-tescom",
     title: "Lagos State Teaching Service Commission (TESCOM) Recruitment Portal",
     acronym: "TESCOM",
     agencyFull: "Lagos State Teaching Service Commission",
     category: "education",
     url: "https://tescomjobs.lagosstate.gov.ng",
     domain: "tescomjobs.lagosstate.gov.ng",
-    description: "Official Lagos State Government recruitment portal for graduate teachers across secondary schools in Lagos State.",
+    description: "Official Lagos State Government (.gov.ng) recruitment portal for graduate teachers across secondary schools in Lagos State.",
     diasporaReady: false,
     isFree: true,
     costLabel: "100% Free Application",
@@ -3669,8 +3780,7 @@ const INITIAL_PENDING_SUBMISSIONS = [
     deadlineNote: "Lagos State TESCOM online teacher recruitment portal closes in 4 days!",
     posterType: "RECRUITMENT OPEN",
     posterSubtitle: "Lagos State TESCOM Graduate Teachers Recruitment",
-    popularRank: 2,
-    submittedAt: "18 mins ago",
+    popularRank: 4,
     keywords: ["tescom", "lagos", "teachers", "recruitment", "education", "job"],
     requirements: [
       "B.Ed / B.A (Ed) / B.Sc (Ed) or Bachelor's Degree + PGDE and TRCN Certificate",
@@ -3685,45 +3795,14 @@ const INITIAL_PENDING_SUBMISSIONS = [
     proTip: "Ensure your TRCN certificate is active and your LASRRA ID is verified before submitting."
   },
   {
-    id: "pending-ilera-eko",
-    title: "Lagos State Health Management Agency (LASHMA — ILERA EKO) Portal",
-    acronym: "LASHMA",
-    agencyFull: "Lagos State Health Management Agency",
-    category: "health",
-    url: "https://lashma.com",
-    domain: "lashma.com",
-    description: "Official social health insurance portal for Lagos residents and diaspora sponsors to enroll in the mandatory ILERA EKO health insurance plan.",
-    diasporaReady: true,
-    isFree: false,
-    costLabel: "Affordable Annual Health Plan",
-    windowStatus: "Open 24/7",
-    daysLeft: null,
-    deadlineNote: null,
-    posterType: "HEALTH ENROLLMENT OPEN",
-    posterSubtitle: "ILERA EKO Family & Individual Social Health Insurance",
-    popularRank: 6,
-    submittedAt: "1 hour ago",
-    keywords: ["health", "ilera eko", "lashma", "health insurance", "lagos", "hospital"],
-    requirements: [
-      "Valid NIN or LASRRA ID",
-      "Passport photographs of principal and dependents",
-      "Preferred accredited hospital in Lagos State"
-    ],
-    steps: [
-      "Visit lashma.com and select an Individual, Family, or Diaspora Sponsor plan.",
-      "Choose your nearest accredited hospital and complete online enrollment."
-    ],
-    proTip: "Nigerians in the diaspora can pay online to cover their family members' hospital bills in Lagos all year round."
-  },
-  {
-    id: "pending-nddc-scholarship",
+    id: "nddc-scholarship",
     title: "NDDC Foreign Postgraduate Scholarship Portal",
     acronym: "NDDC",
     agencyFull: "Niger Delta Development Commission",
     category: "education",
     url: "https://scholarship.nddc.gov.ng",
     domain: "scholarship.nddc.gov.ng",
-    description: "Official NDDC Foreign Postgraduate (MSc) Scholarship portal for eligible graduates from Niger Delta states in engineering, medical, and environmental sciences.",
+    description: "Official NDDC (.gov.ng) Foreign Postgraduate (MSc) Scholarship portal for eligible graduates from Niger Delta states in engineering, medical, and environmental sciences.",
     diasporaReady: true,
     isFree: true,
     costLabel: "100% Free (Fully Funded Overseas)",
@@ -3732,8 +3811,7 @@ const INITIAL_PENDING_SUBMISSIONS = [
     deadlineNote: "URGENT: NDDC Foreign Postgraduate Scholarship portal closes in 3 days!",
     posterType: "SCHOLARSHIP CLOSING SOON",
     posterSubtitle: "NDDC Fully-Funded Overseas MSc Scholarship Scheme",
-    popularRank: 3,
-    submittedAt: "2 hours ago",
+    popularRank: 5,
     keywords: ["nddc", "scholarship", "foreign scholarship", "masters", "niger delta"],
     requirements: [
       "First Class or Second Class Upper/Lower Bachelor's Degree in eligible STEM fields",
@@ -3746,6 +3824,67 @@ const INITIAL_PENDING_SUBMISSIONS = [
       "Print your CBT examination slip."
     ],
     proTip: "NDDC CBT screening is strictly merit-based and 100% free."
+  }
+);
+
+// Only UNVERIFIED links or posts from UNKNOWN non-gov domains stay under Pending for manual Admin review
+const INITIAL_PENDING_SUBMISSIONS = [
+  {
+    id: "pending-lashma-com",
+    title: "Lagos Health Scheme (ILERA EKO) Third-Party Domain Submission",
+    acronym: "LASHMA",
+    agencyFull: "Lagos State Health Management Agency (Unverified .com Domain)",
+    category: "health",
+    url: "https://lashma.com",
+    domain: "lashma.com",
+    description: "Community-submitted social health insurance portal for Lagos residents and diaspora sponsors. Held in Pending because it uses a commercial '.com' domain rather than '.gov.ng'.",
+    diasporaReady: true,
+    isFree: false,
+    costLabel: "Affordable Annual Health Plan",
+    windowStatus: "Open 24/7",
+    daysLeft: null,
+    deadlineNote: null,
+    posterType: "HEALTH ENROLLMENT OPEN",
+    posterSubtitle: "ILERA EKO Family & Individual Social Health Insurance",
+    popularRank: 6,
+    submittedAt: "25 mins ago",
+    verificationReason: "Unknown commercial domain (lashma.com) — verify official agency ownership before approving.",
+    keywords: ["health", "ilera eko", "lashma", "health insurance", "lagos", "hospital"],
+    requirements: [
+      "Valid NIN or LASRRA ID",
+      "Passport photographs of principal and dependents",
+      "Preferred accredited hospital in Lagos State"
+    ],
+    steps: [
+      "Verify domain authenticity and select an Individual, Family, or Diaspora Sponsor plan.",
+      "Choose your nearest accredited hospital and complete online enrollment."
+    ],
+    proTip: "Always confirm commercial (.com) healthcare portals against state ministry directories."
+  },
+  {
+    id: "pending-diaspora-housing-net",
+    title: "Nigeria Diaspora Housing & Mortgage Grant Portal",
+    acronym: "NDHMP",
+    agencyFull: "Unknown Third-Party Portal Submission",
+    category: "finance",
+    url: "https://naijadiasporamortgage-apply.net",
+    domain: "naijadiasporamortgage-apply.net",
+    description: "Submitted by an anonymous user claiming to offer diaspora housing grants. Automatically blocked from live directory and held in Pending because the '.net' domain is not a verified Nigerian institution.",
+    diasporaReady: true,
+    isFree: false,
+    costLabel: "Unverified Fee Structure",
+    windowStatus: "Held for Anti-Scam Inspection",
+    daysLeft: 3,
+    deadlineNote: null,
+    posterType: "UNVERIFIED SUBMISSION",
+    posterSubtitle: "Held by NaijaGateway Smart Anti-Phishing Filter",
+    popularRank: 99,
+    submittedAt: "1 hour ago",
+    verificationReason: "Unrecognized '.net' domain (naijadiasporamortgage-apply.net) — potential clone/scam site held by auto-filter.",
+    keywords: ["diaspora", "mortgage", "grant"],
+    requirements: ["Held for Admin inspection"],
+    steps: ["Admin must inspect URL before publishing or click Reject."],
+    proTip: "Official diaspora mortgages are strictly processed via fmbn.gov.ng and nidcom.gov.ng."
   }
 ];
 
@@ -3767,9 +3906,21 @@ let adminSiteConfig = {
 
 function loadAdminDashboardState() {
   try {
+    // Sync portalsData with any newly added INITIAL_PORTALS (like TESCOM & NDDC)
+    const existingIds = new Set(portalsData.map((p) => p.id));
+    INITIAL_PORTALS.forEach((p) => {
+      if (!existingIds.has(p.id)) {
+        portalsData.push(p);
+      }
+    });
+
     const savedPending = localStorage.getItem("naijagateway_pending_submissions");
     if (savedPending) {
-      pendingSubmissions = JSON.parse(savedPending);
+      const parsed = JSON.parse(savedPending);
+      // Automatically filter out any .gov.ng / verified portals that were previously in pending
+      pendingSubmissions = parsed.filter(
+        (item) => !checkDomainVerificationStatus(item.domain, item.url).isVerified
+      );
     }
 
     const savedCfg = localStorage.getItem("naijagateway_admin_site_config");
@@ -3857,7 +4008,7 @@ function updateAdminPendingBadges() {
   if (kpiNews) kpiNews.textContent = DAILY_CATEGORY_NEWS.length;
 }
 
-function approveAndPublishSubmission(subObj) {
+function approveAndPublishSubmission(subObj, wasAutoVerified = false) {
   portalsData.unshift(subObj);
   try {
     const existingCustom = JSON.parse(
@@ -3881,9 +4032,13 @@ function approveAndPublishSubmission(subObj) {
   renderDirectory();
   renderAdminDashboardContent();
   appendDispatchLog(
-    `🛡️ ADMIN APPROVED: Published "${subObj.title}" (${subObj.acronym}) to live directory & social auto-post queue.`
+    wasAutoVerified
+      ? `✅ SMART AUTO-PUBLISH: Verified domain (${subObj.domain}) — automatically published "${subObj.title}" & queued for social broadcast.`
+      : `🛡️ ADMIN APPROVED: Manually verified & published "${subObj.title}" (${subObj.domain}) to live directory.`
   );
-  showToast(`Approved & published "${subObj.title}" to NaijaGateway!`);
+  if (!wasAutoVerified) {
+    showToast(`Approved & published "${subObj.title}" to NaijaGateway!`);
+  }
 }
 
 function renderAdminPendingTab() {
@@ -3894,8 +4049,8 @@ function renderAdminPendingTab() {
     listEl.innerHTML = `
       <div class="empty-state" style="margin: 12px auto; padding: 32px 20px;">
         <div class="empty-icon">✅</div>
-        <h3>All Community Portal Submissions Reviewed!</h3>
-        <p>There are currently 0 pending portals waiting for moderation. New submissions from "Submit Portal" will appear here automatically.</p>
+        <h3>Zero Unverified Links in Pending Queue!</h3>
+        <p>Verified official portals (<code>.gov.ng</code>, <code>.mil.ng</code>, <code>.edu.ng</code>, <code>.org.ng</code>) are published automatically. Any unverified or unknown domain submitted will be caught and held here for your review.</p>
       </div>
     `;
     return;
@@ -3910,19 +4065,24 @@ function renderAdminPendingTab() {
             <div class="pending-sub-meta">
               <span class="urgent-mini-agency">${escapeHTML(sub.acronym)}</span>
               <span class="category-pill">${catObj.icon} ${escapeHTML(catObj.shortName)}</span>
-              ${
-                isClosingSoon(sub)
-                  ? `<span class="red-notice-tag">🚨 Closing in ${sub.daysLeft} Days</span>`
-                  : `<span class="status-pill">Submitted ${escapeHTML(sub.submittedAt || "Recently")}</span>`
-              }
+              <span class="red-notice-tag" style="animation:none; background:#d97706;">
+                ⚠️ Unverified Domain: ${escapeHTML(sub.domain)}
+              </span>
+              <span class="status-pill">Submitted ${escapeHTML(sub.submittedAt || "Recently")}</span>
             </div>
             <h3 class="portal-title" style="margin-bottom: 4px;">${escapeHTML(sub.title)}</h3>
-            <p class="portal-desc" style="margin-bottom: 8px;">${escapeHTML(sub.description)}</p>
+            <p class="portal-desc" style="margin-bottom: 6px;">${escapeHTML(sub.description)}</p>
+            <p style="font-size: 0.77rem; color: var(--urgent-red-600); font-weight: 600; margin-bottom: 8px;">
+              🛡️ Why Held in Pending: ${escapeHTML(
+                sub.verificationReason ||
+                  "Unknown non-government domain — requires manual Admin verification."
+              )}
+            </p>
 
             <!-- Inline Admin Quick-Edit Fields Before Approving -->
             <div class="pending-edit-grid">
               <div class="form-group">
-                <label>Verified Official URL:</label>
+                <label>Inspect / Edit URL Before Approving:</label>
                 <input type="url" class="pending-url-edit" data-sub-id="${sub.id}" value="${escapeHTML(sub.url)}" />
               </div>
               <div class="form-group">
@@ -3955,13 +4115,13 @@ function renderAdminPendingTab() {
 
           <div class="pending-sub-actions">
             <button type="button" class="btn-primary" data-approve-id="${sub.id}">
-              ✅ Approve &amp; Publish
+              ✅ Verify &amp; Publish
             </button>
             <a href="${escapeHTML(sub.url)}" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="text-align:center; font-size:0.78rem; padding:7px 10px;">
               🔍 Inspect URL &nearr;
             </a>
             <button type="button" class="btn-reject" data-reject-id="${sub.id}">
-              🗑️ Reject Submission
+              🗑️ Reject Unknown Link
             </button>
           </div>
         </div>
@@ -3976,7 +4136,6 @@ function renderAdminPendingTab() {
       const sub = pendingSubmissions.find((s) => s.id === id);
       if (!sub) return;
 
-      // Read any inline edits made by Admin before approving
       const card = listEl.querySelector(`[data-pending-card="${id}"]`);
       const editedUrl = card?.querySelector(".pending-url-edit")?.value.trim();
       const editedCat = card?.querySelector(".pending-cat-edit")?.value;
@@ -3997,7 +4156,7 @@ function renderAdminPendingTab() {
         sub.deadlineNote = `Application window closes in ${sub.daysLeft} days!`;
       }
 
-      approveAndPublishSubmission(sub);
+      approveAndPublishSubmission(sub, false);
     });
   });
 
