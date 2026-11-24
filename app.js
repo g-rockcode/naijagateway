@@ -2398,7 +2398,7 @@ const OFFICIAL_SOCIAL_PLATFORMS = [
     icon: "𝕏",
     autoPostEnabled: true,
     scheduleNote: "08:00, 13:00 & 18:00 WAT",
-    bio: "Official Unified Directory of Verified Nigerian Government, Scholarship, NELFUND Loan, FMBN Mortgage, NYSC & Security Portals 🇳🇬 | 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock (Gbolahan Rock Olayiwola)"
+    bio: "Official Unified Directory of Verified Nigerian Government, Scholarship, NELFUND Loan, FMBN Mortgage, NYSC & Security Portals 🇳🇬 | 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock"
   },
   {
     id: "whatsapp",
@@ -2411,7 +2411,7 @@ const OFFICIAL_SOCIAL_PLATFORMS = [
     icon: "🟢",
     autoPostEnabled: true,
     scheduleNote: "Instant Deadline & Poster Broadcasts",
-    bio: "Daily verified Nigerian recruitment alerts, red closing-soon notices (≤5 days), scholarship openings & anti-scam links. Direct WhatsApp/Call: +2347044956858 | 📩 naijagateway.ng@gmail.com | Powered by G.Rock (Gbolahan Rock Olayiwola)"
+    bio: "Daily verified Nigerian recruitment alerts, red closing-soon notices (≤5 days), scholarship openings & anti-scam links. Direct WhatsApp/Call: +2347044956858 | 📩 naijagateway.ng@gmail.com | Powered by G.Rock"
   },
   {
     id: "telegram",
@@ -2437,7 +2437,7 @@ const OFFICIAL_SOCIAL_PLATFORMS = [
     icon: "🔵",
     autoPostEnabled: true,
     scheduleNote: "08:00, 13:00 & 18:00 WAT",
-    bio: "Connecting Nigerians at home & in the diaspora to every official government, scholarship, loan, mortgage & civic portal. Contact: naijagateway.ng@gmail.com | +2347044956858 | Powered by G.Rock (Gbolahan Rock Olayiwola)"
+    bio: "Connecting Nigerians at home & in the diaspora to every official government, scholarship, loan, mortgage & civic portal. Contact: naijagateway.ng@gmail.com | +2347044956858 | Powered by G.Rock"
   },
   {
     id: "instagram",
@@ -2450,7 +2450,7 @@ const OFFICIAL_SOCIAL_PLATFORMS = [
     icon: "📸",
     autoPostEnabled: true,
     scheduleNote: "Daily 1080×1080 Carousel & Story Posters",
-    bio: "🇳🇬 Nigeria's #1 Verified Portal Hub | Scholarships • Loans • Mortgages • Passports • NYSC • Military Jobs | 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock (Gbolahan Rock Olayiwola)"
+    bio: "🇳🇬 Nigeria's #1 Verified Portal Hub | Scholarships • Loans • Mortgages • Passports • NYSC • Military Jobs | 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock"
   },
   {
     id: "tiktok",
@@ -2476,7 +2476,7 @@ const OFFICIAL_SOCIAL_PLATFORMS = [
     icon: "🔗",
     autoPostEnabled: true,
     scheduleNote: "Daily Career, Grant & Diaspora Digest",
-    bio: "Empowering Nigerian professionals, students, businesses & the diaspora with verified access to statutory institutions. 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock (Gbolahan Rock Olayiwola)"
+    bio: "Empowering Nigerian professionals, students, businesses & the diaspora with verified access to statutory institutions. 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock"
   }
 ];
 
@@ -2695,7 +2695,7 @@ function renderPublicSocialChannelsStrip() {
       if (ch && navigator.clipboard) {
         navigator.clipboard
           .writeText(
-            `${ch.name} (${ch.handle})\n${ch.url}\nContact: naijagateway.ng@gmail.com | +2347044956858\nPowered by G.Rock (Gbolahan Rock Olayiwola)\n\nBio:\n${ch.bio}`
+            `${ch.name} (${ch.handle})\n${ch.url}\nContact: naijagateway.ng@gmail.com | +2347044956858\nPowered by G.Rock\n\nBio:\n${ch.bio}`
           )
           .then(() => {
             showToast(`Copied official ${ch.name} handle, contact & bio!`);

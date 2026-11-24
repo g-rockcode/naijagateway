@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 NaijaGateway — Daily Automated Social Media Broadcaster
-Powered by G.Rock (Gbolahan Rock Olayiwola)
+Powered by G.Rock
 Official Contact: naijagateway.ng@gmail.com | +2347044956858
 
 Runs daily via GitHub Actions (08:00, 13:00, 18:00 WAT) or locally.
@@ -32,7 +32,7 @@ DAILY_PAYLOADS = [
             "5️⃣ INEC Continuous Voter Registration (CVR) — 5 Days Left (https://cvr.inecnigeria.org)\n\n"
             "✅ View full requirements & apply directly via NaijaGateway: https://naijagateway.ng\n"
             "📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n"
-            "⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n"
+            "⚡ Powered by G.Rock\n"
             "#NaijaGateway #NigeriaJobs #PTDF #NYSC #NigerianArmy #ScholarshipsNG"
         ),
     },
@@ -49,7 +49,7 @@ DAILY_PAYLOADS = [
             "🏥 NHIA GIFSHIP Family & Diaspora Health Insurance: https://www.nhia.gov.ng\n\n"
             "🔒 Stop searching endlessly or falling for fake clone sites. Access every verified Nigerian portal in one place: https://naijagateway.ng\n"
             "📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n"
-            "⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n"
+            "⚡ Powered by G.Rock\n"
             "#NaijaGateway #NigeriansInDiaspora #NELFUND #FMBN #NISPassport"
         ),
     },
@@ -110,7 +110,7 @@ def main():
                 "website": "https://naijagateway.ng",
                 "contactEmail": "naijagateway.ng@gmail.com",
                 "contactPhone": "+2347044956858",
-                "poweredBy": "G.Rock (Gbolahan Rock Olayiwola)",
+                "poweredBy": "G.Rock",
                 "slot": post_item["slot"],
                 "title": post_item["title"],
                 "acronym": post_item["acronym"],
