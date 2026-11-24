@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
 NaijaGateway — Daily Automated Social Media Broadcaster
+Powered by G.Rock (Gbolahan Rock Olayiwola)
+Official Contact: naijagateway.ng@gmail.com | +2347044956858
+
 Runs daily via GitHub Actions (08:00, 13:00, 18:00 WAT) or locally.
 Automatically broadcasts:
   1. Urgent Closing-Soon Portal Alerts (<= 5 Days Left)
   2. Daily Verified Nigerian Category News
   3. Recruitment & Scholarship Open Spotlights
-Dispatches to:
-  - Telegram Channel (@NaijaGatewayAlerts) via Telegram Bot API
-  - Omnichannel Webhook (Make.com / Zapier / Buffer / n8n) for X, Facebook, Instagram, TikTok, LinkedIn & WhatsApp Channel
-  - Directly to X (Twitter) API v2 / Facebook Page Graph API if tokens are provided in environment variables.
 """
 
 import json
@@ -32,6 +31,8 @@ DAILY_PAYLOADS = [
             "4️⃣ NYSC Integrated Mobilization — 4 Days Left (https://portal.nysc.org.ng)\n"
             "5️⃣ INEC Continuous Voter Registration (CVR) — 5 Days Left (https://cvr.inecnigeria.org)\n\n"
             "✅ View full requirements & apply directly via NaijaGateway: https://naijagateway.ng\n"
+            "📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n"
+            "⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n"
             "#NaijaGateway #NigeriaJobs #PTDF #NYSC #NigerianArmy #ScholarshipsNG"
         ),
     },
@@ -47,6 +48,8 @@ DAILY_PAYLOADS = [
             "🏠 FMBN 6% National Housing & Diaspora Mortgage: https://www.fmbn.gov.ng\n"
             "🏥 NHIA GIFSHIP Family & Diaspora Health Insurance: https://www.nhia.gov.ng\n\n"
             "🔒 Stop searching endlessly or falling for fake clone sites. Access every verified Nigerian portal in one place: https://naijagateway.ng\n"
+            "📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n"
+            "⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n"
             "#NaijaGateway #NigeriansInDiaspora #NELFUND #FMBN #NISPassport"
         ),
     },
@@ -105,6 +108,9 @@ def main():
                 "timestamp": now_str,
                 "organization": "NaijaGateway",
                 "website": "https://naijagateway.ng",
+                "contactEmail": "naijagateway.ng@gmail.com",
+                "contactPhone": "+2347044956858",
+                "poweredBy": "G.Rock (Gbolahan Rock Olayiwola)",
                 "slot": post_item["slot"],
                 "title": post_item["title"],
                 "acronym": post_item["acronym"],
@@ -112,7 +118,7 @@ def main():
                 "platforms": [
                     "@NaijaGatewayNG (X)",
                     "NaijaGateway Official (Facebook)",
-                    "NaijaGateway Official Alerts (WhatsApp Channel)",
+                    "NaijaGateway (+2347044956858 WhatsApp)",
                     "@NaijaGatewayAlerts (Telegram)",
                     "@NaijaGateway (Instagram)",
                     "@NaijaGateway (TikTok)",

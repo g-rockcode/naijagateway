@@ -2248,20 +2248,29 @@ function drawRecruitmentPosterCanvas(portal, badgeOverride, themeKey) {
   ctx.fillText(
     `Fee Status: ${portal.costLabel}   •   Status: ${portal.windowStatus}`,
     100,
-    892
+    884
   );
 
   // 5. Bottom Official URL Call-to-Action Footer
-  drawRoundedRect(ctx, 64, 950, W - 128, 86, 18, "#ffffff");
+  drawRoundedRect(ctx, 64, 930, W - 128, 78, 16, "#ffffff");
   ctx.fillStyle = "#0f172a";
-  ctx.font = "800 24px 'Plus Jakarta Sans', Inter, sans-serif";
-  ctx.fillText("APPLY DIRECTLY AT:", 96, 1002);
+  ctx.font = "800 23px 'Plus Jakarta Sans', Inter, sans-serif";
+  ctx.fillText("APPLY DIRECTLY AT:", 96, 978);
 
   ctx.fillStyle = "#008751";
-  ctx.font = "800 26px 'JetBrains Mono', monospace";
+  ctx.font = "800 25px 'JetBrains Mono', monospace";
   const displayUrl =
     portal.url.length > 42 ? portal.domain : portal.url.replace(/^https?:\/\//, "");
-  ctx.fillText(displayUrl, 365, 1003);
+  ctx.fillText(displayUrl, 360, 979);
+
+  // 6. Official Contact & Powered by G.Rock Credit Footer Line on Poster
+  ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+  ctx.font = "600 18px Inter, sans-serif";
+  ctx.fillText(
+    "📩 naijagateway.ng@gmail.com  •  📞 +2347044956858  •  ⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)",
+    68,
+    1048
+  );
 }
 
 function drawRoundedRect(ctx, x, y, width, height, radius, fillStyle, strokeStyle) {
@@ -2326,12 +2335,16 @@ function updateSocialCaptionAndBroadcastLinks(portal, badgeOverride) {
         }`
       : portal.posterType || "OFFICIAL APPLICATION OPEN";
 
-  const caption = `🇳🇬 ${headline}: ${portal.title} (${portal.acronym})\n\n` +
+  const caption =
+    `🇳🇬 ${headline}: ${portal.title} (${portal.acronym})\n\n` +
     `✅ Official Verified Portal: ${portal.url}\n` +
     `💰 Fee Status: ${portal.costLabel}\n` +
     `⏳ Status: ${portal.windowStatus}\n` +
     `📋 Key Requirement: ${(portal.requirements && portal.requirements[0]) || "Valid NIN"}\n\n` +
-    `⚠️ Beware of touts and fake links. Access all verified Nigerian government, scholarship, mortgage, and security portals via NaijaGateway! #Nigeria #${portal.acronym.replace(/[^a-zA-Z0-9]/g, "")} #NaijaGateway #NigeriaJobs`;
+    `🌐 Unified Directory: https://naijagateway.ng\n` +
+    `📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
+    `⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n` +
+    `#Nigeria #${portal.acronym.replace(/[^a-zA-Z0-9]/g, "")} #NaijaGateway #NigeriaJobs`;
 
   const textarea = document.getElementById("posterCaptionTextarea");
   if (textarea) {
@@ -2379,77 +2392,91 @@ const OFFICIAL_SOCIAL_PLATFORMS = [
     name: "X (Twitter)",
     handle: "@NaijaGatewayNG",
     url: "https://x.com/NaijaGatewayNG",
+    contactEmail: "naijagateway.ng@gmail.com",
+    contactPhone: "+2347044956858",
     color: "#0f172a",
     icon: "𝕏",
     autoPostEnabled: true,
     scheduleNote: "08:00, 13:00 & 18:00 WAT",
-    bio: "Official Unified Directory of Verified Nigerian Government, Scholarship, NELFUND Loan, FMBN Mortgage, NYSC & Military Recruitment Portals 🇳🇬 | https://naijagateway.ng"
+    bio: "Official Unified Directory of Verified Nigerian Government, Scholarship, NELFUND Loan, FMBN Mortgage, NYSC & Security Portals 🇳🇬 | 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock (Gbolahan Rock Olayiwola)"
   },
   {
     id: "whatsapp",
-    name: "WhatsApp Channel",
-    handle: "NaijaGateway Official Alerts",
-    url: "https://whatsapp.com/channel/naijagateway",
+    name: "WhatsApp Channel & Helpline",
+    handle: "NaijaGateway (+2347044956858)",
+    url: "https://wa.me/2347044956858",
+    contactEmail: "naijagateway.ng@gmail.com",
+    contactPhone: "+2347044956858",
     color: "#16a34a",
     icon: "🟢",
     autoPostEnabled: true,
     scheduleNote: "Instant Deadline & Poster Broadcasts",
-    bio: "Daily verified Nigerian recruitment alerts, red closing-soon notices (≤5 days), scholarship openings, and anti-scam portal links straight to your WhatsApp."
+    bio: "Daily verified Nigerian recruitment alerts, red closing-soon notices (≤5 days), scholarship openings & anti-scam links. Direct WhatsApp/Call: +2347044956858 | 📩 naijagateway.ng@gmail.com | Powered by G.Rock (Gbolahan Rock Olayiwola)"
   },
   {
     id: "telegram",
     name: "Telegram Broadcast Channel",
     handle: "@NaijaGatewayAlerts",
     url: "https://t.me/NaijaGatewayAlerts",
+    contactEmail: "naijagateway.ng@gmail.com",
+    contactPhone: "+2347044956858",
     color: "#0284c7",
     icon: "✈️",
     autoPostEnabled: true,
     scheduleNote: "Direct Bot API Auto-Post (3x Daily)",
-    bio: "Automated daily alerts for Nigerian International Passports, NYSC, PTDF/FSB Scholarships, Army/Customs/NSCDC Recruitment & FMBN Mortgages. Link: https://naijagateway.ng"
+    bio: "Automated daily alerts for Nigerian International Passports, NYSC, PTDF/FSB Scholarships, Army/Customs Recruitment & FMBN Mortgages. 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock"
   },
   {
     id: "facebook",
     name: "Facebook Official Page",
     handle: "NaijaGateway Official",
     url: "https://facebook.com/NaijaGateway",
+    contactEmail: "naijagateway.ng@gmail.com",
+    contactPhone: "+2347044956858",
     color: "#1877f2",
     icon: "🔵",
     autoPostEnabled: true,
     scheduleNote: "08:00, 13:00 & 18:00 WAT",
-    bio: "Connecting Nigerians at home & in the diaspora to every official government, scholarship, loan, mortgage, and civic portal with step-by-step requirements."
+    bio: "Connecting Nigerians at home & in the diaspora to every official government, scholarship, loan, mortgage & civic portal. Contact: naijagateway.ng@gmail.com | +2347044956858 | Powered by G.Rock (Gbolahan Rock Olayiwola)"
   },
   {
     id: "instagram",
     name: "Instagram Official",
     handle: "@NaijaGateway",
     url: "https://instagram.com/NaijaGateway",
+    contactEmail: "naijagateway.ng@gmail.com",
+    contactPhone: "+2347044956858",
     color: "#e1306c",
     icon: "📸",
     autoPostEnabled: true,
     scheduleNote: "Daily 1080×1080 Carousel & Story Posters",
-    bio: "🇳🇬 Nigeria's #1 Verified Portal Hub | Scholarships • Student Loans • Mortgages • Passports • NYSC • Military Jobs | Avoid fake links 👇 https://naijagateway.ng"
+    bio: "🇳🇬 Nigeria's #1 Verified Portal Hub | Scholarships • Loans • Mortgages • Passports • NYSC • Military Jobs | 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock (Gbolahan Rock Olayiwola)"
   },
   {
     id: "tiktok",
     name: "TikTok Civic Hub",
     handle: "@NaijaGateway",
     url: "https://tiktok.com/@NaijaGateway",
+    contactEmail: "naijagateway.ng@gmail.com",
+    contactPhone: "+2347044956858",
     color: "#111827",
     icon: "🎵",
     autoPostEnabled: true,
     scheduleNote: "Daily 60s How-To Apply Guides & Posters",
-    bio: "Step-by-step guides for Nigerian Passports, NELFUND Student Loans, FMBN Mortgages, NYSC & Free Military Recruitments 🇳🇬✨ https://naijagateway.ng"
+    bio: "Step-by-step guides for Nigerian Passports, NELFUND Student Loans, FMBN Mortgages, NYSC & Free Military Recruitments 🇳🇬✨ 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock"
   },
   {
     id: "linkedin",
     name: "LinkedIn Organization Page",
     handle: "NaijaGateway Civic Hub",
     url: "https://linkedin.com/company/naijagateway",
+    contactEmail: "naijagateway.ng@gmail.com",
+    contactPhone: "+2347044956858",
     color: "#0a66c2",
     icon: "🔗",
     autoPostEnabled: true,
     scheduleNote: "Daily Career, Grant & Diaspora Digest",
-    bio: "Empowering Nigerian professionals, students, businesses, and the global diaspora with verified access to statutory institutions, BOI/SMEDAN grants, and federal careers."
+    bio: "Empowering Nigerian professionals, students, businesses & the diaspora with verified access to statutory institutions. 📩 naijagateway.ng@gmail.com | 📞 +2347044956858 | Powered by G.Rock (Gbolahan Rock Olayiwola)"
   }
 ];
 
@@ -2473,7 +2500,14 @@ function loadSocialAutomationState() {
     if (savedPlatforms) {
       const parsed = JSON.parse(savedPlatforms);
       if (Array.isArray(parsed) && parsed.length === OFFICIAL_SOCIAL_PLATFORMS.length) {
-        socialPlatformsState = parsed;
+        // Merge latest bios/contact details while preserving user's autoPostEnabled toggles
+        socialPlatformsState = OFFICIAL_SOCIAL_PLATFORMS.map((def, idx) => ({
+          ...def,
+          autoPostEnabled:
+            typeof parsed[idx]?.autoPostEnabled === "boolean"
+              ? parsed[idx].autoPostEnabled
+              : def.autoPostEnabled
+        }));
       }
     }
 
@@ -2562,7 +2596,9 @@ function buildDailyAutoPostQueue() {
         `⏳ Status: ${slot1Portal.windowStatus}\n` +
         `💰 Fee: ${slot1Portal.costLabel}\n` +
         `✅ Direct Official Portal: ${slot1Portal.url}\n` +
-        `🌐 Step-by-Step Guide & Requirements: https://naijagateway.ng\n\n` +
+        `🌐 Step-by-Step Guide & Requirements: https://naijagateway.ng\n` +
+        `📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
+        `⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n\n` +
         `#NaijaGateway #${slot1Portal.acronym} #NigeriaOpportunities #DeadlineAlert #Nigeria`
     },
     {
@@ -2579,7 +2615,9 @@ function buildDailyAutoPostQueue() {
         `📰 DAILY VERIFIED NIGERIA PORTAL NEWS (via ${topNews.source}):\n` +
         `"${topNews.headline}"\n\n` +
         `🔗 Access the Official ${slot2Portal.acronym} Portal directly: ${slot2Portal.url}\n` +
-        `📋 Full Requirements Checklist on NaijaGateway: https://naijagateway.ng\n\n` +
+        `📋 Full Requirements Checklist on NaijaGateway: https://naijagateway.ng\n` +
+        `📩 Inquiries: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
+        `⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n\n` +
         `#NaijaGateway #NigeriaNews #${slot2Portal.acronym} #NigeriansInDiaspora`
     },
     {
@@ -2597,7 +2635,9 @@ function buildDailyAutoPostQueue() {
         `🏛️ Institution: ${slot3Portal.agencyFull}\n` +
         `💰 Application Cost: ${slot3Portal.costLabel}\n` +
         `📋 Key Requirement: ${(slot3Portal.requirements && slot3Portal.requirements[0]) || "Valid NIN"}\n` +
-        `🔒 Verified Official Link: ${slot3Portal.url}\n\n` +
+        `🔒 Verified Official Link: ${slot3Portal.url}\n` +
+        `📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
+        `⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n\n` +
         `⚠️ Avoid touts and fake sites! Verify all portals at https://naijagateway.ng #NigeriaJobs #${slot3Portal.acronym} #NaijaGateway`
     }
   ];
@@ -2629,6 +2669,10 @@ function renderPublicSocialChannelsStrip() {
           <p class="channel-bio-snippet" style="margin-top: 10px;">
             ${escapeHTML(ch.bio)}
           </p>
+          <div style="margin-top: 8px; padding-top: 7px; border-top: 1px dashed var(--border-color); font-size: 0.73rem; display: flex; flex-wrap: wrap; gap: 8px;">
+            <a href="mailto:naijagateway.ng@gmail.com" class="inline-contact-link">✉️ naijagateway.ng@gmail.com</a>
+            <a href="https://wa.me/2347044956858" target="_blank" rel="noopener noreferrer" class="inline-contact-link">📞 +2347044956858</a>
+          </div>
         </div>
         <div class="channel-card-actions">
           <button type="button" class="btn-secondary" data-copy-bio="${ch.id}">
@@ -2650,9 +2694,11 @@ function renderPublicSocialChannelsStrip() {
       );
       if (ch && navigator.clipboard) {
         navigator.clipboard
-          .writeText(`${ch.name} (${ch.handle})\n${ch.url}\n\nBio:\n${ch.bio}`)
+          .writeText(
+            `${ch.name} (${ch.handle})\n${ch.url}\nContact: naijagateway.ng@gmail.com | +2347044956858\nPowered by G.Rock (Gbolahan Rock Olayiwola)\n\nBio:\n${ch.bio}`
+          )
           .then(() => {
-            showToast(`Copied official ${ch.name} handle & bio!`);
+            showToast(`Copied official ${ch.name} handle, contact & bio!`);
           });
       }
     });
@@ -2698,6 +2744,10 @@ function renderSocialCommandCenter() {
             <p class="channel-bio-snippet" style="margin-top: 9px;">
               ${escapeHTML(ch.bio)}
             </p>
+            <div style="margin-top: 7px; font-size: 0.73rem; display: flex; flex-wrap: wrap; gap: 8px;">
+              <a href="mailto:naijagateway.ng@gmail.com" class="inline-contact-link">✉️ naijagateway.ng@gmail.com</a>
+              <a href="https://wa.me/2347044956858" target="_blank" rel="noopener noreferrer" class="inline-contact-link">📞 +2347044956858</a>
+            </div>
           </div>
           <div>
             <div class="account-mgr-meta">
@@ -3023,15 +3073,18 @@ function downloadOfficialBrandAsset(type) {
     ctx.fillRect(0, 0, 800, 800);
 
     // Inner emblem
-    drawRoundedRect(ctx, 180, 140, 440, 400, 56, "#ffffff");
-    drawRoundedRect(ctx, 310, 140, 180, 400, 0, "#008751");
+    drawRoundedRect(ctx, 180, 120, 440, 380, 56, "#ffffff");
+    drawRoundedRect(ctx, 310, 120, 180, 380, 0, "#008751");
     ctx.fillStyle = "#ffffff";
-    ctx.font = "800 72px 'Plus Jakarta Sans', Inter, sans-serif";
+    ctx.font = "800 68px 'Plus Jakarta Sans', Inter, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("NAIJAGATEWAY", 400, 645);
-    ctx.font = "600 32px 'JetBrains Mono', monospace";
+    ctx.fillText("NAIJAGATEWAY", 400, 610);
+    ctx.font = "600 28px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#a7f3d0";
-    ctx.fillText("naijagateway.ng", 400, 705);
+    ctx.fillText("naijagateway.ng • +2347044956858", 400, 665);
+    ctx.font = "600 22px Inter, sans-serif";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText("Powered by G.Rock (Gbolahan Rock Olayiwola)", 400, 725);
     ctx.textAlign = "left";
 
     const link = document.createElement("a");
@@ -3058,25 +3111,33 @@ function downloadOfficialBrandAsset(type) {
     ctx.fillRect(1000, 0, 500, 14);
 
     ctx.fillStyle = "#6ee7b7";
-    ctx.font = "800 26px 'JetBrains Mono', monospace";
-    ctx.fillText("🇳🇬 OFFICIAL UNIFIED NIGERIAN PORTAL DIRECTORY & DAILY ALERTS", 90, 120);
+    ctx.font = "800 25px 'JetBrains Mono', monospace";
+    ctx.fillText("🇳🇬 OFFICIAL UNIFIED NIGERIAN PORTAL DIRECTORY & DAILY ALERTS", 90, 105);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "800 76px 'Plus Jakarta Sans', Inter, sans-serif";
-    ctx.fillText("NaijaGateway.ng", 90, 220);
+    ctx.font = "800 72px 'Plus Jakarta Sans', Inter, sans-serif";
+    ctx.fillText("NaijaGateway.ng", 90, 195);
 
     ctx.fillStyle = "#e2e8f0";
-    ctx.font = "600 30px Inter, sans-serif";
+    ctx.font = "600 28px Inter, sans-serif";
     ctx.fillText(
       "Passports • Scholarships • NELFUND Loans • FMBN Mortgages • NYSC • Military Jobs • NHIA Health",
       90,
-      290
+      258
     );
 
-    drawRoundedRect(ctx, 90, 345, 780, 74, 16, "#008751");
+    drawRoundedRect(ctx, 90, 300, 820, 68, 16, "#008751");
     ctx.fillStyle = "#ffffff";
-    ctx.font = "800 28px 'Plus Jakarta Sans', Inter, sans-serif";
-    ctx.fillText("🔒 100% Verified Official Links • Daily Auto-Posted Alerts", 120, 392);
+    ctx.font = "800 26px 'Plus Jakarta Sans', Inter, sans-serif";
+    ctx.fillText("🔒 100% Verified Official Links • Daily Auto-Posted Alerts", 120, 344);
+
+    ctx.fillStyle = "#a7f3d0";
+    ctx.font = "600 24px Inter, sans-serif";
+    ctx.fillText(
+      "📩 naijagateway.ng@gmail.com  •  📞 +2347044956858  •  ⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)",
+      90,
+      432
+    );
 
     const link = document.createElement("a");
     link.download = "NaijaGateway-Official-Cover-Banner-1500x500.png";
