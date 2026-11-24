@@ -2265,10 +2265,10 @@ function drawRecruitmentPosterCanvas(portal, badgeOverride, themeKey) {
 
   // 6. Official Contact & Powered by G.Rock Credit Footer Line on Poster
   ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
-  ctx.font = "600 18px Inter, sans-serif";
+  ctx.font = "600 20px Inter, sans-serif";
   ctx.fillText(
-    "📩 naijagateway.ng@gmail.com  •  📞 +2347044956858  •  ⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)",
-    68,
+    "📩 naijagateway.ng@gmail.com   •   📞 +2347044956858   •   ⚡ Powered by G.Rock",
+    86,
     1048
   );
 }
@@ -2343,7 +2343,7 @@ function updateSocialCaptionAndBroadcastLinks(portal, badgeOverride) {
     `📋 Key Requirement: ${(portal.requirements && portal.requirements[0]) || "Valid NIN"}\n\n` +
     `🌐 Unified Directory: https://naijagateway.ng\n` +
     `📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
-    `⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n` +
+    `⚡ Powered by G.Rock\n` +
     `#Nigeria #${portal.acronym.replace(/[^a-zA-Z0-9]/g, "")} #NaijaGateway #NigeriaJobs`;
 
   const textarea = document.getElementById("posterCaptionTextarea");
@@ -2598,7 +2598,7 @@ function buildDailyAutoPostQueue() {
         `✅ Direct Official Portal: ${slot1Portal.url}\n` +
         `🌐 Step-by-Step Guide & Requirements: https://naijagateway.ng\n` +
         `📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
-        `⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n\n` +
+        `⚡ Powered by G.Rock\n\n` +
         `#NaijaGateway #${slot1Portal.acronym} #NigeriaOpportunities #DeadlineAlert #Nigeria`
     },
     {
@@ -2617,7 +2617,7 @@ function buildDailyAutoPostQueue() {
         `🔗 Access the Official ${slot2Portal.acronym} Portal directly: ${slot2Portal.url}\n` +
         `📋 Full Requirements Checklist on NaijaGateway: https://naijagateway.ng\n` +
         `📩 Inquiries: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
-        `⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n\n` +
+        `⚡ Powered by G.Rock\n\n` +
         `#NaijaGateway #NigeriaNews #${slot2Portal.acronym} #NigeriansInDiaspora`
     },
     {
@@ -2637,7 +2637,7 @@ function buildDailyAutoPostQueue() {
         `📋 Key Requirement: ${(slot3Portal.requirements && slot3Portal.requirements[0]) || "Valid NIN"}\n` +
         `🔒 Verified Official Link: ${slot3Portal.url}\n` +
         `📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
-        `⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)\n\n` +
+        `⚡ Powered by G.Rock\n\n` +
         `⚠️ Avoid touts and fake sites! Verify all portals at https://naijagateway.ng #NigeriaJobs #${slot3Portal.acronym} #NaijaGateway`
     }
   ];
@@ -3082,9 +3082,9 @@ function downloadOfficialBrandAsset(type) {
     ctx.font = "600 28px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#a7f3d0";
     ctx.fillText("naijagateway.ng • +2347044956858", 400, 665);
-    ctx.font = "600 22px Inter, sans-serif";
+    ctx.font = "600 24px Inter, sans-serif";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText("Powered by G.Rock (Gbolahan Rock Olayiwola)", 400, 725);
+    ctx.fillText("Powered by G.Rock", 400, 725);
     ctx.textAlign = "left";
 
     const link = document.createElement("a");
@@ -3132,9 +3132,9 @@ function downloadOfficialBrandAsset(type) {
     ctx.fillText("🔒 100% Verified Official Links • Daily Auto-Posted Alerts", 120, 344);
 
     ctx.fillStyle = "#a7f3d0";
-    ctx.font = "600 24px Inter, sans-serif";
+    ctx.font = "600 25px Inter, sans-serif";
     ctx.fillText(
-      "📩 naijagateway.ng@gmail.com  •  📞 +2347044956858  •  ⚡ Powered by G.Rock (Gbolahan Rock Olayiwola)",
+      "📩 naijagateway.ng@gmail.com   •   📞 +2347044956858   •   ⚡ Powered by G.Rock",
       90,
       432
     );
