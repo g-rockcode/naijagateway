@@ -2142,17 +2142,27 @@ function drawRecruitmentPosterCanvas(portal, badgeOverride, themeKey) {
   ctx.fillStyle = "#008751";
   ctx.fillRect((W / 3) * 2, 0, W / 3, 18);
 
-  // 2. Top Header Brand & Category Pill
+  // 2. Top Header Brand, Official Logo & Category Pill
+  let textStartX = 64;
+  if (
+    window.__officialLogoImg &&
+    window.__officialLogoImg.complete &&
+    window.__officialLogoImg.naturalWidth > 0
+  ) {
+    ctx.drawImage(window.__officialLogoImg, 64, 44, 88, 88);
+    textStartX = 168;
+  }
+
   ctx.fillStyle = "#ffffff";
   ctx.font = "800 32px 'Plus Jakarta Sans', Inter, sans-serif";
-  ctx.fillText("🇳🇬 NAIJAGATEWAY OFFICIAL ALERT", 64, 88);
+  ctx.fillText("🇳🇬 NAIJAGATEWAY OFFICIAL ALERT", textStartX, 86);
 
-  ctx.font = "600 22px Inter, sans-serif";
-  ctx.fillStyle = "rgba(255, 255, 255, 0.78)";
+  ctx.font = "600 21px Inter, sans-serif";
+  ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
   ctx.fillText(
-    catObj ? `${catObj.name.toUpperCase()}` : "VERIFIED NIGERIAN PORTAL",
-    64,
-    124
+    catObj ? `${catObj.name.toUpperCase()}` : "YOUR GATEWAY TO EVERYTHING NIGERIAN",
+    textStartX,
+    120
   );
 
   // 3. Headline Status Banner (RECRUITMENT OPEN / APPLICATION OPEN / CLOSING SOON)
@@ -3057,41 +3067,25 @@ async function executeOmnichannelAutoPost(slot) {
   );
 }
 
-// Generate Official Brand Avatar (800x800) or Cover Banner (1500x500)
+// Preload Official NaijaGateway Logo Image for Canvas Posters & Brand Kit
+(function preloadOfficialLogo() {
+  const img = new Image();
+  img.src = "logo.png";
+  window.__officialLogoImg = img;
+})();
+
+// Generate Official Brand Avatar (logo.png) or Cover Banner (1500x500 with logo.png)
 function downloadOfficialBrandAsset(type) {
   const canvas = document.getElementById("brandKitCanvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
 
   if (type === "avatar") {
-    canvas.width = 800;
-    canvas.height = 800;
-    const grad = ctx.createLinearGradient(0, 0, 800, 800);
-    grad.addColorStop(0, "#008751");
-    grad.addColorStop(1, "#042f1d");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 800, 800);
-
-    // Inner emblem
-    drawRoundedRect(ctx, 180, 120, 440, 380, 56, "#ffffff");
-    drawRoundedRect(ctx, 310, 120, 180, 380, 0, "#008751");
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "800 68px 'Plus Jakarta Sans', Inter, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("NAIJAGATEWAY", 400, 610);
-    ctx.font = "600 28px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#a7f3d0";
-    ctx.fillText("naijagateway.ng • +2347044956858", 400, 665);
-    ctx.font = "600 24px Inter, sans-serif";
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText("Powered by G.Rock", 400, 725);
-    ctx.textAlign = "left";
-
     const link = document.createElement("a");
-    link.download = "NaijaGateway-Official-Logo-800x800.png";
-    link.href = canvas.toDataURL("image/png");
+    link.download = "NaijaGateway-Official-Logo.png";
+    link.href = "logo.png";
     link.click();
-    showToast("Downloaded Official 800×800 Social Profile Logo!");
+    showToast("Downloaded Official NaijaGateway Profile Logo!");
   } else {
     canvas.width = 1500;
     canvas.height = 500;
@@ -3110,33 +3104,43 @@ function downloadOfficialBrandAsset(type) {
     ctx.fillStyle = "#008751";
     ctx.fillRect(1000, 0, 500, 14);
 
+    let textX = 90;
+    if (
+      window.__officialLogoImg &&
+      window.__officialLogoImg.complete &&
+      window.__officialLogoImg.naturalWidth > 0
+    ) {
+      ctx.drawImage(window.__officialLogoImg, 80, 90, 310, 310);
+      textX = 430;
+    }
+
     ctx.fillStyle = "#6ee7b7";
-    ctx.font = "800 25px 'JetBrains Mono', monospace";
-    ctx.fillText("🇳🇬 OFFICIAL UNIFIED NIGERIAN PORTAL DIRECTORY & DAILY ALERTS", 90, 105);
+    ctx.font = "800 23px 'JetBrains Mono', monospace";
+    ctx.fillText("🇳🇬 YOUR GATEWAY TO EVERYTHING NIGERIAN", textX, 115);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "800 72px 'Plus Jakarta Sans', Inter, sans-serif";
-    ctx.fillText("NaijaGateway.ng", 90, 195);
+    ctx.font = "800 68px 'Plus Jakarta Sans', Inter, sans-serif";
+    ctx.fillText("NaijaGateway.ng", textX, 198);
 
     ctx.fillStyle = "#e2e8f0";
-    ctx.font = "600 28px Inter, sans-serif";
-    ctx.fillText(
-      "Passports • Scholarships • NELFUND Loans • FMBN Mortgages • NYSC • Military Jobs • NHIA Health",
-      90,
-      258
-    );
-
-    drawRoundedRect(ctx, 90, 300, 820, 68, 16, "#008751");
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "800 26px 'Plus Jakarta Sans', Inter, sans-serif";
-    ctx.fillText("🔒 100% Verified Official Links • Daily Auto-Posted Alerts", 120, 344);
-
-    ctx.fillStyle = "#a7f3d0";
     ctx.font = "600 25px Inter, sans-serif";
     ctx.fillText(
+      "Passports • Scholarships • NELFUND Loans • FMBN Mortgages • NYSC • Military Jobs",
+      textX,
+      255
+    );
+
+    drawRoundedRect(ctx, textX, 295, 810, 66, 16, "#008751");
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 25px 'Plus Jakarta Sans', Inter, sans-serif";
+    ctx.fillText("🔒 100% Verified Official Links • Daily Auto-Posted Alerts", textX + 28, 338);
+
+    ctx.fillStyle = "#a7f3d0";
+    ctx.font = "600 23px Inter, sans-serif";
+    ctx.fillText(
       "📩 naijagateway.ng@gmail.com   •   📞 +2347044956858   •   ⚡ Powered by G.Rock",
-      90,
-      432
+      textX,
+      425
     );
 
     const link = document.createElement("a");
