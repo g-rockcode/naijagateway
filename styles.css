@@ -2510,6 +2510,52 @@ body {
   flex-wrap: wrap;
 }
 
+.platform-launch-showcase {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  background: var(--bg-page);
+  border: 2px solid var(--ng-green-600);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.launch-poster-thumb-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.launch-poster-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-xs);
+}
+
+.launch-poster-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.launch-broadcast-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 860px) {
+  .platform-launch-showcase {
+    grid-template-columns: 1fr;
+  }
+}
+
 .social-accounts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

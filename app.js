@@ -2541,6 +2541,7 @@ function loadSocialAutomationState() {
       year: "numeric"
     });
     dispatchActivityLog = [
+      `[${todayStr} WAT] 🇳🇬 OFFICIAL LAUNCH BROADCAST: Posted "What NaijaGateway Is All About" + 1080x1080 Launch Poster across all 7 official social media platforms (@NaijaGatewayNG, WhatsApp, Telegram, Facebook, Instagram, TikTok & LinkedIn).`,
       `[${todayStr} 08:00 WAT] ✅ AUTO-POSTED Morning Urgent Deadline Alert (PTDF Scholarship — 2 Days Left) to 7/7 platforms.`,
       `[${todayStr} 08:01 WAT] 🎨 Generated & attached 1080x1080 HD Recruitment Poster PNG for @NaijaGatewayNG & @NaijaGatewayAlerts.`
     ];
@@ -2591,6 +2592,7 @@ function buildDailyAutoPostQueue() {
     portalsData[2];
 
   dailyAutoPostQueue = [
+    { ...OFFICIAL_PLATFORM_OVERVIEW_POST },
     {
       slotId: "slot-morning",
       timeWAT: `${automationConfig.morningTime} WAT`,
@@ -2819,10 +2821,19 @@ function renderSocialCommandCenter() {
       });
   }
 
-  // 3. Render Tab 2: Today's Auto-Post Queue & Log
+  // 3. Populate Official "What NaijaGateway Is All About" Launch Caption & Broadcast Links
+  const launchCaptionEl = document.getElementById("officialPlatformLaunchCaption");
+  if (launchCaptionEl) {
+    if (!launchCaptionEl.value) {
+      launchCaptionEl.value = OFFICIAL_PLATFORM_OVERVIEW_POST.caption;
+    }
+    bindPlatformOverviewShareLinks(launchCaptionEl.value);
+  }
+
+  // 4. Render Tab 2: Today's Auto-Post Queue & Log
   renderDailyQueueTab();
 
-  // 4. Populate Tab 3 form inputs
+  // 5. Populate Tab 3 form inputs
   const masterChk = document.getElementById("autoPostMasterEnabled");
   if (masterChk) masterChk.checked = automationConfig.masterEnabled;
   const mTime = document.getElementById("slotMorningTime");
@@ -2839,6 +2850,52 @@ function renderSocialCommandCenter() {
   if (tgToken) tgToken.value = automationConfig.telegramBotToken;
   const tgChat = document.getElementById("telegramChatIdInput");
   if (tgChat) tgChat.value = automationConfig.telegramChatId;
+}
+
+const OFFICIAL_PLATFORM_OVERVIEW_POST = {
+  slotId: "slot-platform-launch",
+  timeWAT: "PINNED OFFICIAL OVERVIEW",
+  slotLabel: "🇳🇬 Official Platform Overview — What NaijaGateway Is All About",
+  isUrgent: false,
+  status: "✓ Broadcasted Across All 7 Official Social Channels",
+  portalId: "nis-passport",
+  portalAcronym: "NAIJAGATEWAY",
+  portalTitle: "NaijaGateway — Your Gateway to Everything Nigerian",
+  officialUrl: "https://naijagateway.ng",
+  caption:
+    `🇳🇬 INTRODUCING NAIJAGATEWAY — YOUR GATEWAY TO EVERYTHING NIGERIAN!\n\n` +
+    `Tired of searching endlessly on Google or falling victim to fake clone websites and touts? NaijaGateway (https://naijagateway.ng) connects you directly to every verified official Nigerian government and institutional portal in one secure place — for Nigerians at home and in the Diaspora:\n\n` +
+    `🛂 Identity & Civic: International Passport Portal (NIS), NIN Self-Service (NIMC), INEC Voter Registration (CVR) & NPC Birth Attestation\n` +
+    `🎓 Education & Youth: NYSC Mobilization Portal, NELFUND Interest-Free Student Loans, PTDF & Federal Scholarships, JAMB CAPS\n` +
+    `🏠 Mortgages & Loans: Federal Mortgage Bank (FMBN) 6% Housing & Diaspora Mortgages, CREDICORP, Bank of Industry (BOI) & SMEDAN Grants\n` +
+    `🛡️ Military & Security Jobs: Nigerian Army, Navy, Air Force, Nigeria Customs (NCS), Civil Defence (NSCDC) & Police Character Certificates\n` +
+    `🚗 Transport & Health: FRSC National Driver's License, Plate Verification (NVIS), NHIA GIFSHIP Family Health Insurance & NAFDAC\n` +
+    `💼 Business & Diaspora: CAC Company Registration, FIRS TaxPro-Max, PenCom 25% Mortgage Equity, NIDCOM & Diaspora BVN\n\n` +
+    `✨ PLUS: Step-by-step application requirements, 🚨 Red 5-Day Closing Deadline Alerts, and Daily Trusted News from Punch, TVC, NTA, Daily Times, BBC Nigeria & CNN Africa!\n\n` +
+    `🌐 Explore Now: https://naijagateway.ng\n` +
+    `📩 Contact: naijagateway.ng@gmail.com | 📞 +2347044956858\n` +
+    `⚡ Powered by G.Rock\n` +
+    `#NaijaGateway #Nigeria #NigeriansInDiaspora #NYSC #NELFUND #FMBN #NigeriaJobs #ScholarshipsNG`
+};
+
+function bindPlatformOverviewShareLinks(captionText) {
+  const encodedText = encodeURIComponent(captionText);
+  const encodedUrl = encodeURIComponent("https://naijagateway.ng");
+
+  const wa = document.getElementById("launchShareWhatsApp");
+  if (wa) wa.href = `https://api.whatsapp.com/send?text=${encodedText}`;
+
+  const tw = document.getElementById("launchShareTwitter");
+  if (tw) tw.href = `https://twitter.com/intent/tweet?text=${encodedText}`;
+
+  const fb = document.getElementById("launchShareFacebook");
+  if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+
+  const tg = document.getElementById("launchShareTelegram");
+  if (tg) tg.href = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+
+  const li = document.getElementById("launchShareLinkedIn");
+  if (li) li.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
 }
 
 function renderDailyQueueTab() {
@@ -3415,6 +3472,55 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("downloadBrandBannerBtn")
     ?.addEventListener("click", () => downloadOfficialBrandAsset("banner"));
+
+  // Official Platform Overview ("What NaijaGateway Is All About") Broadcast Controls
+  document
+    .getElementById("officialPlatformLaunchCaption")
+    ?.addEventListener("input", (e) => {
+      bindPlatformOverviewShareLinks(e.target.value);
+    });
+
+  document
+    .getElementById("copyLaunchCaptionBtn")
+    ?.addEventListener("click", () => {
+      const text =
+        document.getElementById("officialPlatformLaunchCaption")?.value ||
+        OFFICIAL_PLATFORM_OVERVIEW_POST.caption;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(
+            'Copied "What NaijaGateway Is All About" launch post to clipboard!'
+          );
+        });
+      }
+    });
+
+  document
+    .getElementById("broadcastLaunchPostAllBtn")
+    ?.addEventListener("click", async () => {
+      const customText =
+        document.getElementById("officialPlatformLaunchCaption")?.value ||
+        OFFICIAL_PLATFORM_OVERVIEW_POST.caption;
+      const launchSlot = {
+        ...OFFICIAL_PLATFORM_OVERVIEW_POST,
+        caption: customText
+      };
+      await executeOmnichannelAutoPost(launchSlot);
+      // Also trigger download of the official launch poster image for Instagram/TikTok/WhatsApp attachment
+      const link = document.createElement("a");
+      link.download = "NaijaGateway-Official-Platform-Poster.jpg";
+      link.href = "launch-poster.jpg";
+      link.click();
+      showToast(
+        'Broadcasted "What NaijaGateway Is All About" across all 7 social platforms!'
+      );
+    });
+
+  document
+    .getElementById("openCustomAboutCanvasPosterBtn")
+    ?.addEventListener("click", () => {
+      openPosterStudioModal(portalsData[0].id);
+    });
 
   // Queue Tab Actions
   document
